@@ -1,6 +1,6 @@
 #include "osc_sdk.h"
 
-int main(void)
+int main(int ac, char **av)
 {
 	struct osc_env e;
 	struct osc_resp r;

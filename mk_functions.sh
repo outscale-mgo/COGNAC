@@ -1,7 +1,7 @@
 #!/bin/sh
 
-CALL_LIST_FILE=$1
-CALL_LIST=$(cat $1)
+CALL_LIST_FILE=./call_list
+CALL_LIST=$(cat $CALL_LIST_FILE)
 
 source ./helper.sh
 
@@ -14,8 +14,17 @@ replace_args()
 	have_args=$?
 	grep ____func_code____ <<< "$line" > /dev/null
 	have_func_code=$?
+	grep ____functions_proto____ <<< "$line" > /dev/null
+	have_func_protos=$?
+
 	if [ $have_args == 0 ]; then
 	    ./mk_args.c.sh
+	elif [ $have_func_protos == 0 ] ; then
+	    for l in $CALL_LIST; do
+		echo -n int osc_;
+		echo -n $l | to_snakecase ;
+		echo "(struct osc_env *e, struct osc_resp *out, struct osc_arg *args);" ;
+	    done
 	elif [ $have_func_code == 0 ]; then
 	    for x in $CALL_LIST ;do
 		snake_x=$(to_snakecase <<< $x)
@@ -37,4 +46,4 @@ replace_args()
     done < $1
 }
 
-replace_args lib.c > osc_sdk.c
+replace_args $1 > $2

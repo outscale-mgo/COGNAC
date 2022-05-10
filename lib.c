@@ -1,25 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "curl/curl.h"
+#include "osc_sdk.h"
 
 #define AK_SIZE 20
 #define SK_SIZE 40
-
-struct osc_env {
-	char *ak;
-	char *sk;
-	struct curl_slist *headers;
-	CURL *c;
-};
-
-struct osc_resp {
-	int len;
-	char *buf;
-};
-
-struct osc_arg {
-	____args____
-};
 
 /* Function that will write the data inside a variable */
 static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)

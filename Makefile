@@ -1,6 +1,14 @@
+# CONIAC for: Code Outscale Generator New Automatic Creator
+# you can find a better name if you want.
 
-osc_sdk.c: osc-api.json call_list arguments-list.json
-	./mk_functions.sh call_list
+main.c: osc-api.json call_list arguments-list.json osc_sdk.h osc_sdk.c
+	./mk_functions.sh main_tpl.c main.c
+
+osc_sdk.c: osc-api.json call_list arguments-list.json osc_sdk.h
+	./mk_functions.sh lib.c osc_sdk.c
+
+osc_sdk.h: osc-api.json call_list arguments-list.json
+	./mk_functions.sh lib.h osc_sdk.h
 
 osc-api.json:
 	curl -s https://raw.githubusercontent.com/outscale/osc-api/master/outscale.yaml \
@@ -15,6 +23,5 @@ arguments-list.json:
 call_list: osc-api.json
 	json-search operationId osc-api.json | tr -d "\n[]\"" | sed 's/,/ /g' > call_list
 
-
 clean:
-	rm osc-api.json call_list osc_sdk.c arguments-list.json
+	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h
