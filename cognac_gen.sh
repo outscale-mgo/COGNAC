@@ -16,9 +16,29 @@ replace_args()
 	have_func_code=$?
 	grep ____functions_proto____ <<< "$line" > /dev/null
 	have_func_protos=$?
+	grep ____cli_parser____ <<< "$line" > /dev/null
+	have_cli_parser=$?
 
 	if [ $have_args == 0 ]; then
 	    ./mk_args.c.sh
+	elif [ $have_cli_parser == 0 ] ; then
+	    echo "	for (int i = 1; i < ac; ++i) {"
+	    for l in $CALL_LIST; do
+		snake_l=$(to_snakecase <<< $l)
+
+		cat <<EOF
+              if (!strcmp("$l", av[i])) {
+	      	     struct osc_arg a = {0};
+
+	      	     osc_$snake_l(&e, &r, NULL);
+		     puts(r.buf);
+		     osc_deinit_resp(&r);
+	      } else
+EOF
+	    done
+
+	    echo "             { printf(\"Unknow Call %s\n\", av[i]); }"
+	    echo "	}"
 	elif [ $have_func_protos == 0 ] ; then
 	    for l in $CALL_LIST; do
 		echo -n int osc_;
