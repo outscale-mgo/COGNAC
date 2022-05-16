@@ -24,4 +24,4 @@ call_list: osc-api.json
 	json-search operationId osc-api.json | tr -d "\n[]\"" | sed 's/,/ /g' > call_list
 
 clean:
-	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h
+	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h main.c

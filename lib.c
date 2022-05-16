@@ -6,29 +6,71 @@
 #define AK_SIZE 20
 #define SK_SIZE 40
 
+/* We don't use _Bool as we try to be C89 compatible */
+int osc_str_append_bool(struct osc_str *osc_str, int bool)
+{
+	int len = osc_str->len;
+
+	osc_str->len = len + (bool ? 4 : 5);
+	osc_str->buf = realloc(osc_str->buf, osc_str->len + 1);
+	if (!osc_str->buf)
+		return -1;
+	strcpy(osc_str->buf + len, (bool ? "true" : "false"));
+	return 0;
+}
+
+int osc_str_append_int(struct osc_str *osc_str, int i)
+{
+	int len = osc_str->len;
+
+	osc_str->buf = realloc(osc_str->buf, len + 64);
+	if (!osc_str->buf)
+		return -1;
+	osc_str->len = len + snprintf(osc_str->buf + len, 64, "%d", i);
+	osc_str->buf[osc_str->len] = 0;
+	return 0;
+}
+
+int osc_str_append_string(struct osc_str *osc_str, const char *str)
+{
+	if (!str)
+		return 0;
+
+	int len = osc_str->len;
+	int dlen = strlen(str);
+
+	osc_str->len = osc_str->len + dlen;
+	osc_str->buf = realloc(osc_str->buf, osc_str->len + 1);
+	if (!osc_str->buf)
+		return -1;
+	memcpy(osc_str->buf + len, str, dlen + 1);
+	return 0;
+}
+
 /* Function that will write the data inside a variable */
 static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
 {
 	size_t bufsize = size * nmemb;
-	struct osc_resp *response = userp;
+	struct osc_str *response = userp;
 	int olen = response->len;
 
 	response->len = response->len + bufsize;
-	response->buf = realloc(response->buf, response->len);
+	response->buf = realloc(response->buf, response->len + 1);
 	memcpy(response->buf + olen, data, bufsize);
+	response->buf[response->len] = 0;
 	return bufsize;
 }
 
-void osc_init_resp(struct osc_resp *r)
+void osc_init_str(struct osc_str *r)
 {
 	r->len = 0;
 	r->buf = NULL;
 }
 
-void osc_deinit_resp(struct osc_resp *r)
+void osc_deinit_str(struct osc_str *r)
 {
 	free(r->buf);
-	osc_init_resp(r);
+	osc_init_str(r);
 }
 
 ____func_code____

@@ -10,7 +10,7 @@ struct osc_env {
 	CURL *c;
 };
 
-struct osc_resp {
+struct osc_str {
 	int len;
 	char *buf;
 };
@@ -19,8 +19,8 @@ struct osc_arg {
 	____args____
 };
 
-void osc_init_resp(struct osc_resp *r);
-void osc_deinit_resp(struct osc_resp *r);
+void osc_init_str(struct osc_str *r);
+void osc_deinit_str(struct osc_str *r);
 int osc_init_sdk(struct osc_env *e);
 void osc_deinit_sdk(struct osc_env *e);
 

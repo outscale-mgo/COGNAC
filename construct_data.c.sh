@@ -8,33 +8,31 @@ args=$(json-search ${func}Request osc-api.json | json-search -K properties | tr 
 
 for x in $args ;do
     snake_x=$(to_snakecase <<< $x)
-    cat << EOF
-    	if (args->$snake_x) {
-	        tot_len += strlen(args->$snake_x);
-    	}
+    t=$(get_type $x)
 
-EOF
-done
-
-cat <<EOF
-       if (tot_len < 1) {
-               return NULL;
-       }
-       ret = malloc(tot_len + 1);
-       if (!ret) { return NULL; }
-       tmp_ret = ret;
-EOF
-
-for x in $args ;do
-    snake_x=$(to_snakecase <<< $x)
-
-    cat << EOF
-    	if (args->$snake_x) {
-	       tmp_ret = stpcpy(tmp_ret, args->$snake_x);
-	       if (!tmp_ret) {
-	               return NULL;
-	       }
+    if [ $t == 'bool' ]; then
+	cat <<EOF
+	if (args->is_set_$snake_x) {
+		osc_str_append_string(data, "\"$x\\":" );
+                osc_str_append_bool(data, args->$snake_x);
+	   	ret += 1;
 	}
 EOF
+    elif [ $t ==  'int' ]; then
+	cat <<EOF
+	if (args->is_set_$snake_x) {
+		osc_str_append_string(data, "\"$x\\":" );
+                osc_str_append_int(data, args->$snake_x);
+	   	ret += 1;
+	}
+EOF
+    else
+	cat <<EOF
+	if (args->$snake_x) {
+		osc_str_append_string(data, "\"$x\\":" );
+                ret = !osc_str_append_string(data, args->$snake_x);
+	}
+EOF
+    fi
 done
 

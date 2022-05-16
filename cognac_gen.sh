@@ -25,14 +25,51 @@ replace_args()
 	    echo "	for (int i = 1; i < ac; ++i) {"
 	    for l in $CALL_LIST; do
 		snake_l=$(to_snakecase <<< $l)
+		arg_list=$(json-search ${l}Request osc-api.json \
+			       | json-search -K properties \
+			       | tr -d "[]\"," | sed '/^$/d')
 
 		cat <<EOF
               if (!strcmp("$l", av[i])) {
 	      	     struct osc_arg a = {0};
+		     if (i + 2 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
+ 		             char *next_a = &av[i + 1][2];
+ 		     	     char *aa = av[i + 2];
+EOF
 
-	      	     osc_$snake_l(&e, &r, NULL);
+		for a in $arg_list ; do
+		    type=$(get_type $a)
+		    snake_a=$(to_snakecase <<< $a)
+
+		    cat <<EOF
+			      if (!strcmp(next_a, "$a") ) {
+EOF
+		    if [ 'int' == $type ]; then
+		    cat <<EOF
+			            a.is_set_$snake_a = 1;
+			     	    a.$snake_a = atoi(aa);
+       			    }
+EOF
+		    elif [ 'bool' == $type ]; then
+			cat <<EOF
+			            a.is_set_$snake_a = 1;
+			            a.$snake_a = (!strcmp(aa, "true") || !strcmp(aa, "True"));
+       			    }
+EOF
+		    else
+		    cat <<EOF
+			            a.$snake_a = aa;
+       			    }
+EOF
+		    fi
+		done
+
+		cat <<EOF
+		              i += 2;
+		     }
+	      	     osc_$snake_l(&e, &r, &a);
 		     puts(r.buf);
-		     osc_deinit_resp(&r);
+		     osc_deinit_str(&r);
 	      } else
 EOF
 	    done
@@ -43,7 +80,7 @@ EOF
 	    for l in $CALL_LIST; do
 		echo -n int osc_;
 		echo -n $l | to_snakecase ;
-		echo "(struct osc_env *e, struct osc_resp *out, struct osc_arg *args);" ;
+		echo "(struct osc_env *e, struct osc_str *out, struct osc_arg *args);" ;
 	    done
 	elif [ $have_func_code == 0 ]; then
 	    for x in $CALL_LIST ;do
