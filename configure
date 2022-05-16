@@ -1,0 +1,26 @@
+#!/bin/sh
+
+# go https://github.com/niess/python-appimage/releases for the list
+
+JSON_SEARCH=json-search
+
+for arg in $@; do
+    if [ "--help" = $arg ]; then
+	cat <<EOF
+./configure:
+   --help				like seriously ?
+   --wget-json-search			wget json-search.Appimage
+EOF
+	exit 0
+    fi
+    if [ "--wget-json-search" = $( echo "$arg" | cut -d '=' -f 1) ]; then
+	wget https://github.com/cosmo-ray/json-search/releases/download/0.2/json-search-x86_64.AppImage
+	chmod +x json-search-x86_64.AppImage
+	JSON_SEARCH="./json-search-x86_64.AppImage"
+    fi
+done
+
+echo JSON_SEARCH=$JSON_SEARCH > config.mk
+
+echo "config done:"
+cat config.mk

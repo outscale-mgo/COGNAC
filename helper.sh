@@ -1,3 +1,5 @@
+source ./config.sh
+
 get_type() {
     x=$1
     types=$(json-search -s Request osc-api.json | json-search $x | json-search type 2> /dev/null)
