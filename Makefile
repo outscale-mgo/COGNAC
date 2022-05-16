@@ -1,6 +1,9 @@
 # COGNAC for: Code Outscale Generator New Automatic Creator
 # you can find a better name if you want.
 
+cognac: main.c
+	gcc -Wall -Wextra main.c osc_sdk.c -lcurl -o cognac
+
 main.c: osc-api.json call_list arguments-list.json osc_sdk.h osc_sdk.c
 	./cognac_gen.sh main_tpl.c main.c
 
@@ -23,5 +26,6 @@ arguments-list.json:
 call_list: osc-api.json
 	json-search operationId osc-api.json | tr -d "\n[]\"" | sed 's/,/ /g' > call_list
 
+
 clean:
-	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h main.c
+	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h main.c cognac

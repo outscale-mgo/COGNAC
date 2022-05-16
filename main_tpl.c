@@ -11,7 +11,11 @@ int main(int ac, char **av)
 	osc_init_sdk(&e);
 	osc_init_str(&r);
 
-	____cli_parser____
+	if (ac < 2) {
+		printf("Usage: %s CallName [--Params ParamArgument]\n", av[0]);
+	}
+
+        ____cli_parser____
 
 	osc_init_str(&r);
 	osc_init_sdk(&e);
