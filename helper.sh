@@ -1,8 +1,10 @@
 source ./config.sh
 
+OSC_API_JSON=$(cat ./osc-api.json)
+
 get_type() {
     x=$1
-    types=$(json-search -s Request osc-api.json | json-search $x | json-search type 2> /dev/null)
+    types=$(json-search -s Request <<< $OSC_API_JSON | json-search $x | json-search type 2> /dev/null)
     have_type=$?
     if [ $have_type == 0 ]; then
 	types=$(tr -d ',[]"' <<< $types | sort | uniq)
