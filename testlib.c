@@ -6,7 +6,7 @@ int main(void)
 	struct osc_str r;
 
 	osc_init_sdk(&e);
-	osc_init_str(&r);
+	osc_init_str(&r, 0);
 
 	osc_read_load_balancers(&e, &r, NULL);
 	printf("[%s", r.buf);

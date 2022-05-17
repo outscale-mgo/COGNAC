@@ -75,7 +75,7 @@ void osc_deinit_str(struct osc_str *r)
 
 ____func_code____
 
-int osc_init_sdk(struct osc_env *e)
+int osc_init_sdk(struct osc_env *e, unsigned int flag)
 {
 	char ak_sk[AK_SIZE + SK_SIZE + 2];
 
@@ -98,6 +98,8 @@ int osc_init_sdk(struct osc_env *e)
 	e->headers = curl_slist_append(e->headers, "Content-Type: application/json");
 
 	/* Setting HEADERS */
+	if (flag & OSC_VERBOSE_MODE)
+		curl_easy_setopt(e->c, CURLOPT_VERBOSE, 1);
 	curl_easy_setopt(e->c, CURLOPT_HTTPHEADER, e->headers);
 	curl_easy_setopt(e->c, CURLOPT_WRITEFUNCTION, write_data);
 
