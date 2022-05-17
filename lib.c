@@ -82,9 +82,14 @@ int osc_init_sdk(struct osc_env *e)
 	e->ak = getenv("OSC_ACCESS_KEY");
 	e->sk = getenv("OSC_SECRET_KEY");
 
+	if (!e->ak || !e->sk) {
+		fprintf(stderr, "OSC_ACCESS_KEY and OSC_SECRET_KEY needed\n");
+		return 1;
+	}
+
 	if (strlen(e->ak) != AK_SIZE || strlen(e->sk) != SK_SIZE) {
 		fprintf(stderr, "Wrong size OSC_ACCESS_KEY or OSC_SECRET_KEY\n");
-		return(1);
+		return 1;
 	}
 
 	e->headers = NULL;

@@ -28,7 +28,6 @@ replace_args()
 	if [ $have_args == 0 ]; then
 	    ./mk_args.${lang}.sh
 	elif [ $have_cli_parser == 0 ] ; then
-	    echo "	for (int i = 1; i < ac; ++i) {"
 	    for l in $CALL_LIST; do
 		snake_l=$(to_snakecase <<< $l)
 		arg_list=$(json-search ${l}Request osc-api.json \
@@ -73,15 +72,12 @@ EOF
 		cat <<EOF
 		              i += 2;
 		     }
-	      	     osc_$snake_l(&e, &r, &a);
+	      	     TRY(osc_$snake_l(&e, &r, &a));
 		     puts(r.buf);
 		     osc_deinit_str(&r);
 	      } else
 EOF
 	    done
-
-	    echo "             { printf(\"Unknow Call %s\n\", av[i]); }"
-	    echo "	}"
 	elif [ $have_func_protos == 0 ] ; then
 	    for l in $CALL_LIST; do
 		echo -n int osc_;
