@@ -6,7 +6,7 @@ include config.mk
 all: cognac-completion.bash cognac
 
 cognac: main.c osc_sdk.h osc_sdk.c
-	gcc -Wall -Wextra main.c osc_sdk.c -lcurl -o cognac
+	gcc -Wall -Wextra main.c osc_sdk.c $(CURL_LD) $(CURL_CFLAGS) -o cognac
 
 main.c: osc-api.json call_list arguments-list.json config.sh
 	./cognac_gen.sh main_tpl.c main.c c
