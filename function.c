@@ -18,6 +18,8 @@ int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc_ar
 
 	osc_init_str(&data);
 	r = ____snake_func_____data(args, &data);
+	if (r < 0)
+		return -1;
 
 	curl_easy_setopt(e->c, CURLOPT_URL, "https://api.eu-west-2.outscale.com/api/v1/____func____");
 
