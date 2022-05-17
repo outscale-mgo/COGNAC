@@ -10,7 +10,7 @@ for x in $ARGS_LIST ;do
 
     t=$(get_type $x)
     if [ $t == 'int' -o $t == 'bool' ]; then
-	echo "       int is_set_${snake_name};"
+	echo "        int is_set_${snake_name};"
 	c_type="int "
     fi
     echo -n "        $c_type"
