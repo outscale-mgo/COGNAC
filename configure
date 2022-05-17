@@ -3,6 +3,7 @@
 # go https://github.com/niess/python-appimage/releases for the list
 
 JSON_SEARCH=json-search
+YQ_ARG=''
 
 for arg in $@; do
     if [ "--help" = $arg ]; then
@@ -10,6 +11,7 @@ for arg in $@; do
 ./configure:
    --help				like seriously ?
    --wget-json-search			wget json-search.Appimage
+   --yq-go                              use go version of yq, that use diferents arguments
 EOF
 	exit 0
     fi
@@ -17,10 +19,13 @@ EOF
 	wget https://github.com/cosmo-ray/json-search/releases/download/0.2/json-search-x86_64.AppImage
 	chmod +x json-search-x86_64.AppImage
 	JSON_SEARCH="./json-search-x86_64.AppImage"
+    elif [ "--yq-go" = $arg ]; then
+	YQ_ARG="-o json"
     fi
 done
 
 echo JSON_SEARCH=$JSON_SEARCH > config.mk
+echo YQ_ARG=$YQ_ARG >> config.mk
 
 echo "config done:"
 cat config.mk

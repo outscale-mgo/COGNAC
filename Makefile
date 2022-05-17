@@ -25,7 +25,7 @@ config.sh:
 
 osc-api.json:
 	curl -s https://raw.githubusercontent.com/outscale/osc-api/master/outscale.yaml \
-		| yq > osc-api.json
+		| yq $(YQ_ARG) > osc-api.json
 
 arguments-list.json: osc-api.json
 	$(JSON_SEARCH) -s Request osc-api.json  | $(JSON_SEARCH) -K properties \
