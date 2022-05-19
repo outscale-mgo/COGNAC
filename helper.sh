@@ -7,7 +7,7 @@ get_type() {
     types=$(json-search -s Request <<< $OSC_API_JSON | json-search $x | json-search type 2> /dev/null)
     have_type=$?
     if [ $have_type == 0 ]; then
-	types=$(tr -d ',[]"' <<< $types | sort | uniq)
+	types=$(tr -d ',[]"' <<< $types | sed 's/ /\n/g' | sort | uniq)
 	nb_args=$(wc -w <<< $types)
 
 	if [ $nb_args == 1 ]; then

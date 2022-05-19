@@ -37,6 +37,7 @@ replace_args()
 		cat <<EOF
               if (!strcmp("$l", av[i])) {
 	      	     struct osc_arg a = {0};
+		     ${snake_l}_arg:
 		     if (i + 2 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
  		             char *next_a = &av[i + 1][2];
  		     	     char *aa = av[i + 2];
@@ -71,6 +72,7 @@ EOF
 
 		cat <<EOF
 		              i += 2;
+			      goto ${snake_l}_arg;
 		     }
 	      	     TRY(osc_$snake_l(&e, &r, &a));
 		     puts(r.buf);

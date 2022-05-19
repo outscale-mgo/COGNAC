@@ -1,6 +1,7 @@
 static  int ____snake_func_____data(struct osc_arg *args, struct osc_str *data)
 {
 	int ret = 0;
+	int count_args = 0;
 
 	if (!args)
 		return 0;
