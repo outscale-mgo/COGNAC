@@ -38,9 +38,15 @@ replace_args()
               if (!strcmp("$l", av[i])) {
 	      	     struct osc_arg a = {0};
 		     ${snake_l}_arg:
-		     if (i + 2 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
+		     if (i + 1 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
  		             char *next_a = &av[i + 1][2];
- 		     	     char *aa = av[i + 2];
+ 		     	     char *aa = i + 2 < ac ? av[i + 2] : 0;
+			     int incr = aa ? 2 : 1;
+
+			     if (aa && aa[0] == '-' && aa[1] == '-') {
+				aa = 0;
+				incr = 1;
+			     }
 EOF
 
 		for a in $arg_list ; do
@@ -51,28 +57,47 @@ EOF
 			      if (!strcmp(next_a, "$a") ) {
 EOF
 		    if [ 'int' == $type ]; then
-		    cat <<EOF
+			cat <<EOF
+				    if (!aa) {
+					fprintf(stderr, "$a argument missing\n");
+					return 1;
+				    }
 			            a.is_set_$snake_a = 1;
 			     	    a.$snake_a = atoi(aa);
-       			    }
+       			    } else
 EOF
 		    elif [ 'bool' == $type ]; then
 			cat <<EOF
 			            a.is_set_$snake_a = 1;
-			            a.$snake_a = (!strcmp(aa, "true") || !strcmp(aa, "True"));
-       			    }
+				    if (!aa || !strcasecmp(aa, "true")) {
+					a.$snake_a = 1;
+				    } else if (!strcasecmp(aa, "false")) {
+					a.$snake_a = 0;
+				    } else {
+					fprintf(stderr, "$a require true/false\n");
+					return 1;
+				    }
+       			    } else
 EOF
 		    else
 		    cat <<EOF
+				    if (!aa) {
+					fprintf(stderr, "$a argument missing\n");
+					return 1;
+				    }
 			            a.$snake_a = aa;
-       			    }
+       			    } else
 EOF
 		    fi
 		done
 
 		cat <<EOF
-		              i += 2;
-			      goto ${snake_l}_arg;
+			    {
+				fprintf(stderr, "'%s' is not a valide argument for '$l'\n", next_a);
+				return 1;
+			    }
+		            i += incr;
+			    goto ${snake_l}_arg;
 		     }
 	      	     TRY(osc_$snake_l(&e, &r, &a));
 		     puts(r.buf);
