@@ -4,23 +4,23 @@ OSC_API_JSON=$(cat ./osc-api.json)
 
 get_type() {
     x=$1
-    types=$(json-search -s Request <<< $OSC_API_JSON | json-search $x | json-search type 2> /dev/null)
+    func=$2
+    arg_info=$(json-search ${func}Request <<< $OSC_API_JSON | json-search $x)
+    types=$(json-search -R type 2> /dev/null <<< $arg_info)
     have_type=$?
     if [ $have_type == 0 ]; then
-	types=$(tr -d ',[]"' <<< $types | sed 's/ /\n/g' | sort | uniq)
-	nb_args=$(wc -w <<< $types)
-
-	if [ $nb_args == 1 ]; then
-	    if [ $types == 'integer' ]; then
-		echo int
-		return 0
-	    elif [ $types == 'boolean' ]; then
-		echo bool
-		return 0
-	    fi
+	if [ "$types" == 'integer' ]; then
+	    echo int
+	    return 0
+	elif [ "$types" == 'boolean' ]; then
+	    echo bool
+	    return 0
 	fi
+	echo $types
+    else
+	json-search -R '$ref' <<< ${arg_info} | cut  -d '/' -f 4
+
     fi
-    echo 'unknow'
     return 0
 }
 

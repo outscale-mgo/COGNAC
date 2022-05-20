@@ -19,9 +19,7 @@ struct osc_str {
 
 #define OSC_VERBOSE_MODE 1
 
-struct osc_arg {
-	____args____
-};
+____args____
 
 void osc_init_str(struct osc_str *r);
 void osc_deinit_str(struct osc_str *r);

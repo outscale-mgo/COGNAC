@@ -36,7 +36,7 @@ replace_args()
 
 		cat <<EOF
               if (!strcmp("$l", av[i])) {
-	      	     struct osc_arg a = {0};
+	      	     struct osc_${snake_l}_arg a = {0};
 		     ${snake_l}_arg:
 		     if (i + 1 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
  		             char *next_a = &av[i + 1][2];
@@ -50,13 +50,13 @@ replace_args()
 EOF
 
 		for a in $arg_list ; do
-		    type=$(get_type $a)
+		    type=$(get_type $a $l)
 		    snake_a=$(to_snakecase <<< $a)
 
 		    cat <<EOF
 			      if (!strcmp(next_a, "$a") ) {
 EOF
-		    if [ 'int' == $type ]; then
+		    if [ 'int' == "$type" ]; then
 			cat <<EOF
 				    if (!aa) {
 					fprintf(stderr, "$a argument missing\n");
@@ -66,7 +66,7 @@ EOF
 			     	    a.$snake_a = atoi(aa);
        			    } else
 EOF
-		    elif [ 'bool' == $type ]; then
+		    elif [ 'bool' == "$type" ]; then
 			cat <<EOF
 			            a.is_set_$snake_a = 1;
 				    if (!aa || !strcasecmp(aa, "true")) {
@@ -107,9 +107,8 @@ EOF
 	    done
 	elif [ $have_func_protos == 0 ] ; then
 	    for l in $CALL_LIST; do
-		echo -n int osc_;
-		echo -n $l | to_snakecase ;
-		echo "(struct osc_env *e, struct osc_str *out, struct osc_arg *args);" ;
+		snake_l=$(to_snakecase <<< $l)
+		echo "int osc_${snake_l}(struct osc_env *e, struct osc_str *out, struct osc_${snake_l}_arg *args);"
 	    done
 	elif [ $have_func_code == 0 ]; then
 	    for x in $CALL_LIST ;do

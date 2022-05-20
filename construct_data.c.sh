@@ -8,9 +8,9 @@ args=$(json-search ${func}Request osc-api.json | json-search -K properties | tr 
 
 for x in $args ;do
     snake_x=$(to_snakecase <<< $x)
-    t=$(get_type $x)
+    t=$(get_type $x $func)
 
-    if [ $t == 'bool' ]; then
+    if [ "$t" == 'bool' ]; then
 	cat <<EOF
 	if (args->is_set_$snake_x) {
 		if (count_args++ > 0)
@@ -23,7 +23,7 @@ for x in $args ;do
 	   	ret += 1;
 	}
 EOF
-    elif [ $t ==  'int' ]; then
+    elif [ "$t" ==  'int' ]; then
 	cat <<EOF
 	if (args->is_set_$snake_x) {
 		if (count_args++ > 0)
