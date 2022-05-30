@@ -20,6 +20,9 @@ for l in $CALL_LIST ;do
 	if [ "$t" == 'int' -o "$t" == 'bool' ]; then
 	    echo "        int is_set_${snake_name};"
 	    c_type="int "
+	elif [ "$t" == 'array integer' ]; then
+	    echo "        char *${snake_name}_str;"
+	    c_type="int *"
 	fi
 	echo "        ${c_type}${snake_name};"
     done

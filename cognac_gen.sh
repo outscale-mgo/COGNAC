@@ -79,6 +79,15 @@ EOF
 				    }
        			    } else
 EOF
+		    elif [ 'array integer' == "$type" ]; then
+		    cat <<EOF
+				    if (!aa) {
+					fprintf(stderr, "$a argument missing\n");
+					return 1;
+				    }
+			            a.${snake_a}_str = aa;
+       			    } else
+EOF
 		    else
 		    cat <<EOF
 				    if (!aa) {
