@@ -99,7 +99,7 @@ EOF
 		            i += incr;
 			    goto ${snake_l}_arg;
 		     }
-	      	     TRY(osc_$snake_l(&e, &r, &a));
+            	     TRY(osc_$snake_l(&e, &r, &a), "fail to call $l");
 		     puts(r.buf);
 		     osc_deinit_str(&r);
 	      } else

@@ -13,7 +13,7 @@ for l in $CALL_LIST ;do
 
     for x in $ARGS_LIST ;do
 	c_type="char *"
-	snake_name=$(to_snakecase <<< $x)
+	snake_name=$(to_snakecase <<< "$x")
 
 	#echo "get type: $func $x"
 	t=$(get_type $x $l)

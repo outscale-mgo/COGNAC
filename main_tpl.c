@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include "osc_sdk.h"
 
-#define TRY(f) do {				\
-  if (f) {return 1;}				\
+#define TRY(f, s) do {						\
+    if (f) {fprintf(stderr, s"\n");  return 1;}	\
   } while(0)
 
 int main(int ac, char **av)
@@ -15,7 +15,7 @@ int main(int ac, char **av)
 	struct osc_str r;
 	int i;
 
-	TRY(osc_init_sdk(&e, 0));
+	TRY(osc_init_sdk(&e, 0), "fail to init C sdk");
 	osc_init_str(&r);
 
 	if (ac < 2) {
