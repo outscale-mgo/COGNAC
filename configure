@@ -6,6 +6,7 @@ JSON_SEARCH=json-search
 YQ_ARG=''
 CURL_LD='-lcurl'
 CURL_CFLAGS=''
+SED_ALIAS=''
 
 for arg in $@; do
     if [ "--help" = $arg ]; then
@@ -13,8 +14,10 @@ for arg in $@; do
 ./configure:
    --help				like seriously ?
    --wget-json-search			wget json-search.Appimage
+   --gnu-sed-alias			use gsed for sed
    --yq-go                              use go version of yq, that use diferents arguments
    --curl-path=PATH			path to curl source root
+   --curl-install-path=PATH		path to curl installed root
 EOF
 	exit 0
     fi
@@ -24,9 +27,15 @@ EOF
 	JSON_SEARCH="./json-search-x86_64.AppImage"
     elif [ "--yq-go" = $arg ]; then
 	YQ_ARG="-o json"
+    elif [ "--gnu-sed-alias" = $arg ]; then
+	SED_ALIAS="'alias sed=gsed'"
     elif [ "--curl-path" = $( echo "$arg" | cut -d '=' -f 1) ]; then
 	CURL_PATH=$( echo $arg | cut -f 2 -d '=' )
 	CURL_LD="-lcurl -L$CURL_PATH/lib/.libs/"
+	CURL_CFLAGS="-I$CURL_PATH/include/"
+    elif [ "--curl-install-path" = $( echo "$arg" | cut -d '=' -f 1) ]; then
+	CURL_PATH=$( echo $arg | cut -f 2 -d '=' )
+	CURL_LD="-lcurl -L$CURL_PATH/lib/"
 	CURL_CFLAGS="-I$CURL_PATH/include/"
     fi
 done
@@ -35,5 +44,6 @@ echo JSON_SEARCH=$JSON_SEARCH > config.mk
 echo YQ_ARG=$YQ_ARG >> config.mk
 echo CURL_LD=$CURL_LD >> config.mk
 echo CURL_CFLAGS=$CURL_CFLAGS >> config.mk
+echo SED_ALIAS=$SED_ALIAS >> config.mk
 echo "config done:"
 cat config.mk

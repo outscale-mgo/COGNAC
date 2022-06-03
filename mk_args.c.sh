@@ -21,9 +21,7 @@ for l in $CALL_LIST ;do
 	    echo "        int is_set_${snake_name};"
 	    c_type="int "
 	fi
-	echo -n "        $c_type"
-	echo -n $snake_name
-	echo ';'
+	echo "        ${c_type}${snake_name};"
     done
     echo "};"
 done

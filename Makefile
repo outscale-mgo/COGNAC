@@ -22,6 +22,7 @@ cognac-completion.bash: osc-api.json call_list arguments-list.json config.sh
 
 config.sh:
 	echo "alias json-search=$(JSON_SEARCH)" > config.sh
+	echo $(SED_ALIAS) >> config.sh
 
 osc-api.json:
 	curl -s https://raw.githubusercontent.com/outscale/osc-api/master/outscale.yaml \
