@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+shopt -s expand_aliases
 
 func=$1
 
