@@ -6,6 +6,10 @@
 #include "json.h"
 #include "osc_sdk.h"
 
+#ifndef JSON_C_TO_STRING_COLOR
+#define JSON_C_TO_STRING_COLOR 0
+#endif
+
 #define TRY(f, s) do {						\
     if (f) {fprintf(stderr, s"\n");  return 1;}	\
   } while(0)
@@ -14,6 +18,7 @@ int main(int ac, char **av)
 {
 	struct osc_env e;
 	struct osc_str r;
+	int color_flag = 0;
 	int i;
 
 	TRY(osc_init_sdk(&e, 0), "fail to init C sdk");
@@ -25,6 +30,9 @@ int main(int ac, char **av)
 	}
 
 	for (i = 1; i < ac; ++i) {
+		if (!strcmp("--color", av[i])) {
+			color_flag = JSON_C_TO_STRING_COLOR;
+		} else
 		____cli_parser____
 		{
 			printf("Unknow Call %s\n", av[i]);

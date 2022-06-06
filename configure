@@ -31,7 +31,7 @@ EOF
     elif [ "--compile-json-c" = $arg ]; then
         CMAKE=cmake
 
-        git clone https://github.com/json-c/json-c.git
+        git clone https://github.com/cosmo-ray/json-c.git -b color
         mkdir json-c-build
         cd json-c-build
         cmake3 --help > /dev/null
