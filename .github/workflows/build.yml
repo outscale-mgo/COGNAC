@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: setup yq
-      run: snap install yq
+      run: sudo snap install yq
 
     - name: configure
       run: ./configure.sh --wget-json-search --yq-go
