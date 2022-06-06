@@ -1,9 +1,8 @@
-name: Generate source on PR
+name: Generate source build
 
 on:
-  pull_request:
-    branches:
-      - master
+  push:
+    branches: [ master ]
 
 jobs:
   build:
@@ -23,7 +22,10 @@ jobs:
         make main.c osc_sdk.c osc_sdk.h cognac-completion.bash
         tar c osc_sdk.c osc_sdk.h main.c cognac-completion.bash > build-src.tar
 
-    - uses: "actions/upload-artifact@v2"
+    - uses: "marvinpinto/action-automatic-releases@latest"
       with:
-          name: sources
-          path: build-src.tar
+          repo_token: "${{ secrets.TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "sources build (nightly)"
+          files: build-src.tar
