@@ -38,6 +38,7 @@ replace_args()
 
 		cat <<EOF
               if (!strcmp("$l", av[i])) {
+		     json_object *jobj;
 	      	     struct osc_${snake_l}_arg a = {0};
 		     ${snake_l}_arg:
 		     if (i + 1 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
@@ -111,7 +112,9 @@ EOF
 			    goto ${snake_l}_arg;
 		     }
             	     TRY(osc_$snake_l(&e, &r, &a), "fail to call $l");
-		     puts(r.buf);
+		     jobj = json_tokener_parse(r.buf);
+		     puts(json_object_to_json_string_ext(jobj, JSON_C_TO_STRING_PRETTY));
+		     json_object_put(jobj);
 		     osc_deinit_str(&r);
 	      } else
 EOF

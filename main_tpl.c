@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "json.h"
 #include "osc_sdk.h"
 
 #define TRY(f, s) do {						\

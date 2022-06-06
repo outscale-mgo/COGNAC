@@ -7,12 +7,15 @@ YQ_ARG=''
 CURL_LD='-lcurl'
 CURL_CFLAGS=''
 SED_ALIAS=''
+JSON_C_CFLAGS=''
+JSON_C_LDFLAGS='-ljson-c'
 
 for arg in $@; do
     if [ "--help" = $arg ]; then
 	cat <<EOF
 ./configure:
    --help				like seriously ?
+   --compile-json-c			compile json-c
    --wget-json-search			wget json-search.Appimage
    --gnu-sed-alias			use gsed for sed
    --yq-go                              use go version of yq, that use diferents arguments
@@ -25,6 +28,21 @@ EOF
 	wget https://github.com/cosmo-ray/json-search/releases/download/0.2/json-search-x86_64.AppImage
 	chmod +x json-search-x86_64.AppImage
 	JSON_SEARCH="./json-search-x86_64.AppImage"
+    elif [ "--compile-json-c" = $arg ]; then
+        CMAKE=cmake
+
+        git clone https://github.com/json-c/json-c.git
+        mkdir json-c-build
+        cd json-c-build
+        cmake3 --help > /dev/null
+        if [ $? == 0 ]; then
+            CMAKE=cmake3
+        fi
+        $CMAKE ../json-c/
+        make
+        cd -
+	JSON_C_CFLAGS='-I./json-c -I./json-c-build'
+	JSON_C_LDFLAGS='-L./json-c-build -ljson-c'
     elif [ "--yq-go" = $arg ]; then
 	YQ_ARG="-o json"
     elif [ "--gnu-sed-alias" = $arg ]; then
@@ -45,5 +63,7 @@ echo YQ_ARG=$YQ_ARG >> config.mk
 echo CURL_LD=$CURL_LD >> config.mk
 echo CURL_CFLAGS=$CURL_CFLAGS >> config.mk
 echo SED_ALIAS=$SED_ALIAS >> config.mk
+echo JSON_C_LDFLAGS=$JSON_C_LDFLAGS >> config.mk
+echo JSON_C_CFLAGS=$JSON_C_CFLAGS >> config.mk
 echo "config done:"
 cat config.mk
