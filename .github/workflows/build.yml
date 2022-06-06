@@ -20,6 +20,7 @@ jobs:
 
     - name: make
       run: |
+        chsh -s /bin/bash
         make main.c osc_sdk.c osc_sdk.h cognac-completion.bash
         tar c osc_sdk.c osc_sdk.h main.c cognac-completion.bash > build-src.tar
 
