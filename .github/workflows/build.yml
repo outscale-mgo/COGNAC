@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: chrisdickinson/setup-yq@v1.0.0
+    - uses: mikefarah/yq@v4.25.2
 
     - name: configure
       run: ./configure.sh --wget-json-search --yq-go
