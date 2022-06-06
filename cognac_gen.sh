@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 OSC_API_JSON=$(cat ./osc-api.json)
 
@@ -8,6 +8,8 @@ CALL_LIST=$(cat $CALL_LIST_FILE)
 PIPED_CALL_LIST=$(sed 's/ / | /g' <<< $CALL_LIST)
 
 lang=$3
+
+shopt -s expand_aliases
 
 source ./helper.sh
 
