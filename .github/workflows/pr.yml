@@ -13,15 +13,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: "install yq whatever the commande is"
+    - uses: chrisdickinson/setup-yq@v1.0.0
 
     - name: configure
-      run: ./configure.sh --wget-json-search 
+      run: ./configure.sh --wget-json-search --yq-go
 
     - name: make
       run: |
-      	   make main.c osc_sdk.c osc_sdk.h cognac-completion.bash
-	   tar c osc_sdk.c osc_sdk.h main.c cognac-completion.bash > build-src.tar
+        make main.c osc_sdk.c osc_sdk.h cognac-completion.bash
+	tar c osc_sdk.c osc_sdk.h main.c cognac-completion.bash > build-src.tar
 
     - uses: "actions/upload-artifact@v2"
       with:
