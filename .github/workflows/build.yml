@@ -12,7 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: mikefarah/yq@v4.25.2
+    - name: setup yq
+      run: snap install yq
 
     - name: configure
       run: ./configure.sh --wget-json-search --yq-go
