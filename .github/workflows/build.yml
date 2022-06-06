@@ -16,7 +16,7 @@ jobs:
       run: sudo snap install yq
 
     - name: configure
-      run: ./configure.sh --wget-json-search --yq-go
+      run: ./configure --wget-json-search --yq-go
 
     - name: make
       run: |
