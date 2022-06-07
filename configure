@@ -7,8 +7,9 @@ YQ_ARG=''
 CURL_LD='-lcurl'
 CURL_CFLAGS=''
 SED_ALIAS=''
-JSON_C_CFLAGS=''
+JSON_C_CFLAGS='-I/usr/include/json-c/'
 JSON_C_LDFLAGS='-ljson-c'
+HAVE_RECOMPILE_JSON_C=0
 
 for arg in $@; do
     if [ "--help" = $arg ]; then
@@ -43,6 +44,7 @@ EOF
         cd -
 	JSON_C_CFLAGS='-I./json-c -I./json-c-build'
 	JSON_C_LDFLAGS='-L./json-c-build -ljson-c'
+	HAVE_RECOMPILE_JSON_C=1
     elif [ "--yq-go" = $arg ]; then
 	YQ_ARG="-o json"
     elif [ "--gnu-sed-alias" = $arg ]; then
@@ -57,6 +59,19 @@ EOF
 	CURL_CFLAGS="-I$CURL_PATH/include/"
     fi
 done
+
+if [ $HAVE_RECOMPILE_JSON_C == 0 ]; then
+    pkg-config --help > /dev/null
+    if [ $? == 0 ]; then
+	JSON_C_CFLAGS=$(pkg-config --cflags json-c)
+	if [ $? -ne 0 ]; then
+	    echo "[ERROR] json-c not found, you can use --compile-json-c" 1>&2
+	    exit 1
+	fi
+    else
+	echo "[WARNING] pkg-config not found, use '-I/usr/include/json-c/' as default value"
+    fi
+fi
 
 echo JSON_SEARCH=$JSON_SEARCH > config.mk
 echo YQ_ARG=$YQ_ARG >> config.mk
