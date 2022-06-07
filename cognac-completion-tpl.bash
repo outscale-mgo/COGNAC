@@ -26,7 +26,7 @@ _cognac()
 		    eval ${prev}
 		    ;;
                 *)
-                    COMPREPLY=($(compgen -W "____call_list____" -- ${cur}))
+                    COMPREPLY=($(compgen -W "--color ____call_list____" -- ${cur}))
 		    ;;
             esac
             ;;

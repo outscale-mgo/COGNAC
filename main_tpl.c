@@ -25,7 +25,10 @@ int main(int ac, char **av)
 	osc_init_str(&r);
 
 	if (ac < 2) {
-		printf("Usage: %s CallName [--Params ParamArgument]\n", av[0]);
+		printf("Usage: %s CallName [options] [--Params ParamArgument]\n"
+		       "options:"
+		       "\t--color	try to colorize json is json-c support it",
+		       av[0]);
 		return 0;
 	}
 
