@@ -10,9 +10,9 @@
 #define JSON_C_TO_STRING_COLOR 0
 #endif
 
-#define TRY(f, s)				\
+#define TRY(f, args...)						\
 	do {							\
-		if (f) {fprintf(stderr, s"\n");  return 1;}	\
+		if (f) {fprintf(stderr, args);  return 1;}	\
 	} while(0)
 
 int main(int ac, char **av)
@@ -23,7 +23,7 @@ int main(int ac, char **av)
 	int i;
 	char *help_appent = getenv("COGNAC_HELP_APPEND");
 
-	TRY(osc_init_sdk(&e, 0), "fail to init C sdk");
+	TRY(osc_init_sdk(&e, 0), "fail to init C sdk\n");
 	osc_init_str(&r);
 
 	if (ac < 2) {

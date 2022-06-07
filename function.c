@@ -27,5 +27,5 @@ int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc___
 	curl_easy_setopt(e->c, CURLOPT_WRITEDATA, out);
 	res = curl_easy_perform(e->c);
 	osc_deinit_str(&data);
-	return res != CURLE_OK;
+	return res;
 }

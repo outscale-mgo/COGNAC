@@ -40,7 +40,9 @@ replace_args()
               if (!strcmp("$l", av[i])) {
 		     json_object *jobj;
 	      	     struct osc_${snake_l}_arg a = {0};
+	             int cret;
 		     ${snake_l}_arg:
+
 		     if (i + 1 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
  		             char *next_a = &av[i + 1][2];
  		     	     char *aa = i + 2 < ac ? av[i + 2] : 0;
@@ -111,7 +113,8 @@ EOF
 		            i += incr;
 			    goto ${snake_l}_arg;
 		     }
-            	     TRY(osc_$snake_l(&e, &r, &a), "fail to call $l");
+		     cret = osc_$snake_l(&e, &r, &a);
+            	     TRY(osc_$snake_l(&e, &r, &a), "fail to call $l: %s\n", curl_easy_strerror(cret));
 		     jobj = json_tokener_parse(r.buf);
 		     puts(json_object_to_json_string_ext(jobj,
 				JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_NOSLASHESCAPE |
