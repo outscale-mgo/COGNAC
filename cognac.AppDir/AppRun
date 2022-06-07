@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for opt in "$@"
+do
+    if [ "${opt}" == "--bash-completion" ]; then
+	cat "${APPDIR}/usr/bin/cognac-completion.bash"
+        exit 0
+    fi
+done
+
+LD_LIBRARY_PATH=${APPDIR}/usr/lib/ "${APPDIR}/usr/bin/cognac" "$@"

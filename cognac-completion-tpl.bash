@@ -34,5 +34,8 @@ _cognac()
 }
 
 complete -F _cognac cognac
-# this one is for debug
+complete -F _cognac cognac-x86_64.AppImage
+
+# thoses one are for debug
 complete -F _cognac ./cognac
+complete -F _cognac ./cognac-x86_64.AppImage

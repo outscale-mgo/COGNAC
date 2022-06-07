@@ -10,6 +10,8 @@ SED_ALIAS=''
 JSON_C_CFLAGS='-I/usr/include/json-c/'
 JSON_C_LDFLAGS='-ljson-c'
 HAVE_RECOMPILE_JSON_C=0
+LD_CURLLIB_PATH=''
+LD_JSONCLIB_PATH=''
 
 for arg in $@; do
     if [ "--help" = $arg ]; then
@@ -44,6 +46,7 @@ EOF
         cd -
 	JSON_C_CFLAGS='-I./json-c -I./json-c-build'
 	JSON_C_LDFLAGS='-L./json-c-build -ljson-c'
+	LD_JSONCLIB_PATH="./json-c-build"
 	HAVE_RECOMPILE_JSON_C=1
     elif [ "--yq-go" = $arg ]; then
 	YQ_ARG="-o json"
@@ -51,10 +54,12 @@ EOF
 	SED_ALIAS="'alias sed=gsed'"
     elif [ "--curl-path" = $( echo "$arg" | cut -d '=' -f 1) ]; then
 	CURL_PATH=$( echo $arg | cut -f 2 -d '=' )
+	LD_CURLLIB_PATH="$CURL_PATH/lib/.libs/"
 	CURL_LD="-lcurl -L$CURL_PATH/lib/.libs/"
 	CURL_CFLAGS="-I$CURL_PATH/include/"
     elif [ "--curl-install-path" = $( echo "$arg" | cut -d '=' -f 1) ]; then
 	CURL_PATH=$( echo $arg | cut -f 2 -d '=' )
+	LD_CURLLIB_PATH="$CURL_PATH/lib/"
 	CURL_LD="-lcurl -L$CURL_PATH/lib/"
 	CURL_CFLAGS="-I$CURL_PATH/include/"
     fi
@@ -74,6 +79,7 @@ if [ $HAVE_RECOMPILE_JSON_C == 0 ]; then
 fi
 
 echo JSON_SEARCH=$JSON_SEARCH > config.mk
+echo LD_LIB_PATH="$LD_CURLLIB_PATH:$LD_JSONCLIB_PATH" >> config.mk
 echo YQ_ARG=$YQ_ARG >> config.mk
 echo CURL_LD=$CURL_LD >> config.mk
 echo CURL_CFLAGS=$CURL_CFLAGS >> config.mk

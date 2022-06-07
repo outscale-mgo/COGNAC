@@ -8,6 +8,19 @@ all: cognac-completion.bash cognac
 cognac: main.c osc_sdk.h osc_sdk.c
 	gcc -Wall -Wextra main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac
 
+appimagetool-x86_64.AppImage:
+	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
+	chmod +x appimagetool-x86_64.AppImage
+
+cognac-x86_64.AppImage: cognac cognac-completion.bash appimagetool-x86_64.AppImage
+	mkdir -p cognac.AppDir/usr/
+	mkdir -p cognac.AppDir/usr/bin/
+	mkdir -p cognac.AppDir/usr/lib/
+	cp cognac cognac.AppDir/usr/bin/
+	cp cognac-completion.bash cognac.AppDir/usr/bin/
+	LD_LIBRARY_PATH="$(LD_LIB_PATH)" ./cp-lib.sh cognac ./cognac.AppDir/usr/lib/
+	./appimagetool-x86_64.AppImage cognac.AppDir
+
 main.c: osc-api.json call_list arguments-list.json config.sh
 	./cognac_gen.sh main_tpl.c main.c c
 
