@@ -80,6 +80,7 @@ ____func_code____
 int osc_init_sdk(struct osc_env *e, unsigned int flag)
 {
 	char ak_sk[AK_SIZE + SK_SIZE + 2];
+	char *ca = getenv("CURL_CA_BUNDLE");
 
 	e->ak = getenv("OSC_ACCESS_KEY");
 	e->sk = getenv("OSC_SECRET_KEY");
@@ -104,6 +105,10 @@ int osc_init_sdk(struct osc_env *e, unsigned int flag)
 		curl_easy_setopt(e->c, CURLOPT_VERBOSE, 1);
 	curl_easy_setopt(e->c, CURLOPT_HTTPHEADER, e->headers);
 	curl_easy_setopt(e->c, CURLOPT_WRITEFUNCTION, write_data);
+
+	/* setting CA is CURL_CA_BUNDLE is set */
+	if (ca)
+	  curl_easy_setopt(e->c, CURLOPT_CAINFO, ca);
 
 	/* For authentification we specify the method and our acces key / secret key */
 	curl_easy_setopt(e->c, CURLOPT_AWS_SIGV4, "osc");
