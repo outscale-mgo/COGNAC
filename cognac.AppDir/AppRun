@@ -8,4 +8,6 @@ do
     fi
 done
 
+export COGNAC_HELP_APPEND="$(echo -en '\t--bash-completion\tprint bash completion(appimage only)\n')"
+
 LD_LIBRARY_PATH=${APPDIR}/usr/lib/ "${APPDIR}/usr/bin/cognac" "$@"

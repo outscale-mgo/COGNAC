@@ -10,9 +10,10 @@
 #define JSON_C_TO_STRING_COLOR 0
 #endif
 
-#define TRY(f, s) do {						\
-    if (f) {fprintf(stderr, s"\n");  return 1;}	\
-  } while(0)
+#define TRY(f, s)				\
+	do {							\
+		if (f) {fprintf(stderr, s"\n");  return 1;}	\
+	} while(0)
 
 int main(int ac, char **av)
 {
@@ -20,20 +21,26 @@ int main(int ac, char **av)
 	struct osc_str r;
 	int color_flag = 0;
 	int i;
+	char *help_appent = getenv("COGNAC_HELP_APPEND");
 
 	TRY(osc_init_sdk(&e, 0), "fail to init C sdk");
 	osc_init_str(&r);
 
 	if (ac < 2) {
+	show_help:
 		printf("Usage: %s CallName [options] [--Params ParamArgument]\n"
-		       "options:"
-		       "\t--color	try to colorize json is json-c support it\n",
-		       av[0]);
+		       "options:\n"
+		       "\t--help	\tthis\n"
+		       "\t--color	\ttry to colorize json if json-c support it\n%s%s",
+		       av[0], help_appent ? help_appent : "",
+		       help_appent ? "\n" : "");
 		return 0;
 	}
 
 	for (i = 1; i < ac; ++i) {
-		if (!strcmp("--color", av[i])) {
+		if (!strcmp("--help", av[i])) {
+			goto show_help;
+		} else if (!strcmp("--color", av[i])) {
 			color_flag = JSON_C_TO_STRING_COLOR;
 		} else
 		____cli_parser____
