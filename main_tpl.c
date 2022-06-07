@@ -27,7 +27,7 @@ int main(int ac, char **av)
 	if (ac < 2) {
 		printf("Usage: %s CallName [options] [--Params ParamArgument]\n"
 		       "options:"
-		       "\t--color	try to colorize json is json-c support it",
+		       "\t--color	try to colorize json is json-c support it\n",
 		       av[0]);
 		return 0;
 	}
