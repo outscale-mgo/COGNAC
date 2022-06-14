@@ -103,6 +103,8 @@ int osc_init_sdk(struct osc_env *e, unsigned int flag)
 	/* Setting HEADERS */
 	if (flag & OSC_VERBOSE_MODE)
 		curl_easy_setopt(e->c, CURLOPT_VERBOSE, 1);
+	if (flag & OSC_INSECURE_MODE)
+		curl_easy_setopt(e->c, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_easy_setopt(e->c, CURLOPT_HTTPHEADER, e->headers);
 	curl_easy_setopt(e->c, CURLOPT_WRITEFUNCTION, write_data);
 

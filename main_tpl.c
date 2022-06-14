@@ -22,14 +22,24 @@ int main(int ac, char **av)
 	int color_flag = 0;
 	int i;
 	char *help_appent = getenv("COGNAC_HELP_APPEND");
+	unsigned int flag = 0;
 
-	TRY(osc_init_sdk(&e, 0), "fail to init C sdk\n");
+	for (i = 1; i < ac; ++i) {
+		if (!strcmp("--verbose", av[i])) {
+		  flag |= OSC_VERBOSE_MODE;
+		} else if (!strcmp("--insecure", av[i])) {
+		  flag |= OSC_INSECURE_MODE;
+		}
+	}
+	TRY(osc_init_sdk(&e, flag), "fail to init C sdk\n");
 	osc_init_str(&r);
 
 	if (ac < 2) {
 	show_help:
 		printf("Usage: %s CallName [options] [--Params ParamArgument]\n"
 		       "options:\n"
+		       "\t--insecure	\tdoesn't verify SSL certificats\n"
+		       "\t--verbose	\tcurl backend is now verbose\n"
 		       "\t--help	\tthis\n"
 		       "\t--color	\ttry to colorize json if json-c support it\n%s%s",
 		       av[0], help_appent ? help_appent : "",
@@ -38,7 +48,9 @@ int main(int ac, char **av)
 	}
 
 	for (i = 1; i < ac; ++i) {
-		if (!strcmp("--help", av[i])) {
+		if (!strcmp("--verbose", av[i]) || !strcmp("--insecure", av[i])) {
+			/* Avoid Unknow Calls */
+		} else if (!strcmp("--help", av[i])) {
 			goto show_help;
 		} else if (!strcmp("--color", av[i])) {
 			color_flag = JSON_C_TO_STRING_COLOR;

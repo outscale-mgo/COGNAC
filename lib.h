@@ -18,6 +18,7 @@ struct osc_str {
 };
 
 #define OSC_VERBOSE_MODE 1
+#define OSC_INSECURE_MODE 2
 
 ____args____
 
