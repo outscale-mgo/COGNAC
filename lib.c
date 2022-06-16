@@ -81,18 +81,24 @@ int osc_init_sdk(struct osc_env *e, unsigned int flag)
 {
 	char ak_sk[AK_SIZE + SK_SIZE + 2];
 	char *ca = getenv("CURL_CA_BUNDLE");
+	char *endpoint;
 
 	e->ak = getenv("OSC_ACCESS_KEY");
 	e->sk = getenv("OSC_SECRET_KEY");
 	e->region = getenv("OSC_REGION");
+	endpoint = getenv("OSC_ENDPOINT_API");
 	osc_init_str(&e->endpoint);
 
 	if (!e->region)
 		e->region = "eu-west-2";
 
-	osc_str_append_string(&e->endpoint, "https://api.");
-	osc_str_append_string(&e->endpoint, e->region);
-	osc_str_append_string(&e->endpoint, ".outscale.com");
+	if (!endpoint) {
+		osc_str_append_string(&e->endpoint, "https://api.");
+		osc_str_append_string(&e->endpoint, e->region);
+		osc_str_append_string(&e->endpoint, ".outscale.com");
+	} else {
+		osc_str_append_string(&e->endpoint, endpoint);
+	}
 
 	if (!e->ak || !e->sk) {
 		fprintf(stderr, "OSC_ACCESS_KEY and OSC_SECRET_KEY needed\n");
