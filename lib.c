@@ -9,6 +9,27 @@
 #define AK_SIZE 20
 #define SK_SIZE 40
 
+static const char *calls_name[] = {
+  ____call_list_dec____('\t"'; '",\n '; '\tNULL\n')
+};
+
+static const char *calls_descriptions[] = {
+  ____call_list_descriptions____('\t'; ',\n'; '\tNULL\n')
+};
+
+const char *osc_find_description(const char *call_name)
+{
+	const char **c;
+	int i = 0;
+
+	for (c = calls_name; c; ++c) {
+		if (!strcmp(*c, call_name))
+			return calls_descriptions[i];
+		++i;
+	}
+	return NULL;
+}
+
 /* We don't use _Bool as we try to be C89 compatible */
 int osc_str_append_bool(struct osc_str *osc_str, int bool)
 {

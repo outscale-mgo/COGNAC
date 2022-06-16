@@ -26,9 +26,35 @@ replace_args()
 	have_func_protos=$?
 	grep ____cli_parser____ <<< "$line" > /dev/null
 	have_cli_parser=$?
+	grep ____call_list_dec____ <<< "$line" > /dev/null
+	have_call_list_dec=$?
+	grep ____call_list_descriptions____ <<< "$line" > /dev/null
+	have_call_list_des=$?
 
 	if [ $have_args == 0 ]; then
 	    ./mk_args.${lang}.sh
+	elif [ $have_call_list_des == 0 ]; then
+	    DELIMES=$(cut -d '(' -f 2 <<< $line | tr -d ')')
+	    D1=$(cut -d ';' -f 1  <<< $DELIMES | tr -d "'")
+	    D2=$(cut -d ';' -f 2  <<< $DELIMES | tr -d "'")
+	    D3=$(cut -d ';' -f 3  <<< $DELIMES | tr -d "'")
+	    for x in $CALL_LIST ;do
+		echo -en $D1
+		echo $OSC_API_JSON | jq .paths.\""/$x"\".description | sed 's/<br \/>//g'
+		echo -en $D2 
+	    done
+	    echo -ne $D3 
+	elif [ $have_call_list_dec == 0 ]; then
+	    DELIMES=$(cut -d '(' -f 2 <<< $line | tr -d ')')
+	    D1=$(cut -d ';' -f 1  <<< $DELIMES | tr -d "'")
+	    D2=$(cut -d ';' -f 2  <<< $DELIMES | tr -d "'")
+	    D3=$(cut -d ';' -f 3  <<< $DELIMES | tr -d "'")
+	    for x in $CALL_LIST ;do
+		echo -en $D1
+		echo -n $x
+		echo -en $D2 
+	    done
+	    echo -ne $D3 
 	elif [ $have_cli_parser == 0 ] ; then
 	    for l in $CALL_LIST; do
 		snake_l=$(to_snakecase <<< $l)

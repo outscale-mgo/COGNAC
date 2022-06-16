@@ -25,6 +25,9 @@ _cognac()
 		____piped_call_list____)
 		    eval ${prev}
 		    ;;
+		--help)
+		    COMPREPLY=($(compgen -W "____call_list____" -- ${cur}))
+		    ;;
                 *)
                     COMPREPLY=($(compgen -W "--color --insecure --raw-print --verbose --help ____call_list____" -- ${cur}))
 		    ;;

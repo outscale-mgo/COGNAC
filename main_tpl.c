@@ -55,6 +55,16 @@ int main(int ac, char **av)
 		if (!strcmp("--verbose", av[i]) || !strcmp("--insecure", av[i])) {
 			/* Avoid Unknow Calls */
 		} else if (!strcmp("--help", av[i])) {
+			if (av[i+1]) {
+				const char *cd = osc_find_description(av[i+1]);
+				if (cd) {
+					puts(cd);
+					return 0;
+				} else {
+					printf("Unknow Call %s\n", av[i+1]);
+					return 1;
+				}
+			}
 			goto show_help;
 		} else if (!strcmp("--raw-print", av[i])) {
 			program_flag |= OAPI_RAW_OUTPUT;
