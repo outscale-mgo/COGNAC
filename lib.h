@@ -5,16 +5,18 @@
 
 #include <curl/curl.h>
 
-struct osc_env {
-	char *ak;
-	char *sk;
-	struct curl_slist *headers;
-	CURL *c;
-};
-
 struct osc_str {
 	int len;
 	char *buf;
+};
+
+struct osc_env {
+	char *ak;
+	char *sk;
+	char *region;
+	struct curl_slist *headers;
+	struct osc_str endpoint;
+	CURL *c;
 };
 
 #define OSC_VERBOSE_MODE 1

@@ -15,17 +15,22 @@ int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc___
 {
 	CURLcode res;
 	struct osc_str data;
+	struct osc_str end_call;
 	int r;
 
 	osc_init_str(&data);
+	osc_init_str(&end_call);
 	r = ____snake_func_____data(args, &data);
 	if (r < 0)
 		return -1;
 
-	curl_easy_setopt(e->c, CURLOPT_URL, "https://api.eu-west-2.outscale.com/api/v1/____func____");
+	osc_str_append_string(&end_call, e->endpoint.buf);
+	osc_str_append_string(&end_call, "/api/v1/____func____");
+	curl_easy_setopt(e->c, CURLOPT_URL, end_call.buf);
 	curl_easy_setopt(e->c, CURLOPT_POSTFIELDS, r ? data.buf : "");
 	curl_easy_setopt(e->c, CURLOPT_WRITEDATA, out);
 	res = curl_easy_perform(e->c);
+	osc_deinit_str(&end_call);
 	osc_deinit_str(&data);
 	return res;
 }
