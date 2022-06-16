@@ -115,11 +115,15 @@ EOF
 		     }
 		     cret = osc_$snake_l(&e, &r, &a);
             	     TRY(osc_$snake_l(&e, &r, &a), "fail to call $l: %s\n", curl_easy_strerror(cret));
-		     jobj = json_tokener_parse(r.buf);
-		     puts(json_object_to_json_string_ext(jobj,
-				JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_NOSLASHESCAPE |
-				color_flag));
-		     json_object_put(jobj);
+		     if (program_flag & OAPI_RAW_OUTPUT)
+		             puts(r.buf);
+		     else {
+			     jobj = json_tokener_parse(r.buf);
+			     puts(json_object_to_json_string_ext(jobj,
+					JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_NOSLASHESCAPE |
+					color_flag));
+			     json_object_put(jobj);
+		      }
 		     osc_deinit_str(&r);
 	      } else
 EOF

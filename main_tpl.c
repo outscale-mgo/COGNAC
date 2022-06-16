@@ -10,6 +10,8 @@
 #define JSON_C_TO_STRING_COLOR 0
 #endif
 
+#define OAPI_RAW_OUTPUT 1
+
 #define TRY(f, args...)						\
 	do {							\
 		if (f) {fprintf(stderr, args);  return 1;}	\
@@ -23,6 +25,7 @@ int main(int ac, char **av)
 	int i;
 	char *help_appent = getenv("COGNAC_HELP_APPEND");
 	unsigned int flag = 0;
+	unsigned int program_flag = 0;
 
 	for (i = 1; i < ac; ++i) {
 		if (!strcmp("--verbose", av[i])) {
@@ -39,9 +42,10 @@ int main(int ac, char **av)
 		printf("Usage: %s CallName [options] [--Params ParamArgument]\n"
 		       "options:\n"
 		       "\t--insecure	\tdoesn't verify SSL certificats\n"
+		       "\t--raw-print	\tdoesn't format the output\n"
 		       "\t--verbose	\tcurl backend is now verbose\n"
-		       "\t--help	\tthis\n"
-		       "\t--color	\ttry to colorize json if json-c support it\n%s%s",
+		       "\t--help	\t\tthis\n"
+		       "\t--color	\t\ttry to colorize json if json-c support it\n%s%s",
 		       av[0], help_appent ? help_appent : "",
 		       help_appent ? "\n" : "");
 		return 0;
@@ -52,8 +56,10 @@ int main(int ac, char **av)
 			/* Avoid Unknow Calls */
 		} else if (!strcmp("--help", av[i])) {
 			goto show_help;
+		} else if (!strcmp("--raw-print", av[i])) {
+			program_flag |= OAPI_RAW_OUTPUT;
 		} else if (!strcmp("--color", av[i])) {
-			color_flag = JSON_C_TO_STRING_COLOR;
+			color_flag |= JSON_C_TO_STRING_COLOR;
 		} else
 		____cli_parser____
 		{
