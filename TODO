@@ -1,0 +1,11 @@
+- better color (avoir escape sequance in string)
+- man
+- help for each calls
+- conf without AK/SK global variables (for read_regions and others)
+- AK/SK size check, should be just to check I don't overflow
+- package macos + m1
+- package windows
+- rename CLI to oapi-cli
+- templates using https://mustache.github.io/ ?
+- profile hanbdling
+- overload call functionality, so we can have some smarter call, that will for instance return windows password
