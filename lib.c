@@ -83,7 +83,7 @@ int osc_load_ak_sk_from_conf(const char *profile, char **ak, char **sk)
 	strcpy(stpcpy(buf, home), dest);
 	js = json_object_from_file(buf);
 	if (!js) {
-		fprintf(stderr, "OSC_ACCESS_KEY and OSC_SECRET_KEY needed\n");
+		fprintf(stderr, "can't open %s\n", buf);
 		return -1;
 	}
 	js = json_object_object_get(js, profile);
@@ -93,6 +93,26 @@ int osc_load_ak_sk_from_conf(const char *profile, char **ak, char **sk)
 	}
 	*ak = strdup(json_object_get_string(json_object_object_get(js, "access_key")));
 	*sk = strdup(json_object_get_string(json_object_object_get(js, "secret_key")));
+	return 0;
+}
+
+int osc_load_region_from_conf(const char *profile, char **region)
+{
+	const char *dest = "/.osc/config.json";
+	char *home = getenv("HOME");
+	char buf[1024];
+	struct json_object *js;
+
+	strcpy(stpcpy(buf, home), dest);
+	js = json_object_from_file(buf);
+	if (!js) {
+	  fprintf(stderr, "can't open %s\n", buf);
+		return -1;
+	}
+	js = json_object_object_get(js, profile);
+	if (!js)
+		return 0;
+	*region = strdup(json_object_get_string(json_object_object_get(js, "region")));
 	return 0;
 }
 
@@ -147,6 +167,8 @@ int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
 	if (profile) {
 		if (osc_load_ak_sk_from_conf(profile, &e->ak, &e->sk))
 			return -1;
+		if (!osc_load_region_from_conf(profile, &e->region))
+			e->flag |= OSC_ENV_FREE_REGION;
 		e->flag |= OSC_ENV_FREE_AK_SK;
 	}
 
@@ -205,6 +227,10 @@ void osc_deinit_sdk(struct osc_env *e)
 		e->ak = NULL;
 		free(e->sk);
 		e->sk = NULL;
+	}
+	if (e->flag & OSC_ENV_FREE_REGION) {
+		free(e->region);
+		e->region = NULL; 
 	}
 	e->c = NULL;
 	e->flag = 0;

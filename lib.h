@@ -11,6 +11,7 @@ struct osc_str {
 };
 
 #define OSC_ENV_FREE_AK_SK 1
+#define OSC_ENV_FREE_REGION 2
 
 struct osc_env {
 	char *ak;
@@ -28,6 +29,7 @@ struct osc_env {
 ____args____
 
 int osc_load_ak_sk_from_conf(const char *profile, char **ak, char **sk);
+int osc_load_region_from_conf(const char *profile, char **region);
 
 void osc_init_str(struct osc_str *r);
 void osc_deinit_str(struct osc_str *r);
