@@ -34,7 +34,7 @@ int main(int ac, char **av)
 		  flag |= OSC_INSECURE_MODE;
 		}
 	}
-	TRY(osc_init_sdk(&e, flag), "fail to init C sdk\n");
+	TRY(osc_init_sdk(&e, NULL, flag), "fail to init C sdk\n");
 	osc_init_str(&r);
 
 	if (ac < 2) {
@@ -66,7 +66,7 @@ int main(int ac, char **av)
 			printf("Unknow Call %s\n", av[i]);
 		}
 	}
-	
+
 	osc_deinit_str(&r);
 	osc_deinit_sdk(&e);
 	return 0;

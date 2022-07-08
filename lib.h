@@ -10,10 +10,13 @@ struct osc_str {
 	char *buf;
 };
 
+#define OSC_ENV_FREE_AK_SK 1
+
 struct osc_env {
 	char *ak;
 	char *sk;
 	char *region;
+	int flag;
 	struct curl_slist *headers;
 	struct osc_str endpoint;
 	CURL *c;
@@ -24,9 +27,11 @@ struct osc_env {
 
 ____args____
 
+int osc_load_ak_sk_from_conf(const char *profile, char **ak, char **sk);
+
 void osc_init_str(struct osc_str *r);
 void osc_deinit_str(struct osc_str *r);
-int osc_init_sdk(struct osc_env *e, unsigned int flag);
+int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag);
 void osc_deinit_sdk(struct osc_env *e);
 
 ____functions_proto____

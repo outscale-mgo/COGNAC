@@ -4,6 +4,7 @@
 #include <string.h>
 #include "curl/curl.h"
 #include "osc_sdk.h"
+#include "json.h"
 
 #define AK_SIZE 20
 #define SK_SIZE 40
@@ -49,6 +50,31 @@ int osc_str_append_string(struct osc_str *osc_str, const char *str)
 	return 0;
 }
 
+int osc_load_ak_sk_from_conf(const char *profile, char **ak, char **sk)
+{
+	const char *dest = "/.osc/config.json";
+	char *home = getenv("HOME");
+	char buf[1024];
+	struct json_object *js;
+
+	*sk = NULL;
+	*ak = NULL;
+	strcpy(stpcpy(buf, home), dest);
+	js = json_object_from_file(buf);
+	if (!js) {
+		fprintf(stderr, "OSC_ACCESS_KEY and OSC_SECRET_KEY needed\n");
+		return -1;
+	}
+	js = json_object_object_get(js, profile);
+	if (!js) {
+		fprintf(stderr, "can't find profile '%s'\n", profile);
+		return -1;
+	}
+	*ak = strdup(json_object_get_string(json_object_object_get(js, "access_key")));
+	*sk = strdup(json_object_get_string(json_object_object_get(js, "secret_key")));
+	return 0;
+}
+
 /* Function that will write the data inside a variable */
 static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
 {
@@ -77,17 +103,31 @@ void osc_deinit_str(struct osc_str *r)
 
 ____func_code____
 
-int osc_init_sdk(struct osc_env *e, unsigned int flag)
+int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
 {
 	char ak_sk[AK_SIZE + SK_SIZE + 2];
 	char *ca = getenv("CURL_CA_BUNDLE");
 	char *endpoint;
+	char *env_ak = getenv("OSC_ACCESS_KEY");
+	char *env_sk = getenv("OSC_SECRET_KEY");
 
-	e->ak = getenv("OSC_ACCESS_KEY");
-	e->sk = getenv("OSC_SECRET_KEY");
 	e->region = getenv("OSC_REGION");
+	e->flag = 0;
 	endpoint = getenv("OSC_ENDPOINT_API");
 	osc_init_str(&e->endpoint);
+	if (!profile) {
+		profile = getenv("OSC_PROFILE");
+		e->ak = env_ak;
+		e->sk = env_sk;
+		if (!profile && (!e->ak || !e->sk))
+			profile = "default";
+	}
+
+	if (profile) {
+		if (osc_load_ak_sk_from_conf(profile, &e->ak, &e->sk))
+			return -1;
+		e->flag |= OSC_ENV_FREE_AK_SK;
+	}
 
 	if (!e->region)
 		e->region = "eu-west-2";
@@ -101,13 +141,13 @@ int osc_init_sdk(struct osc_env *e, unsigned int flag)
 	}
 
 	if (!e->ak || !e->sk) {
-		fprintf(stderr, "OSC_ACCESS_KEY and OSC_SECRET_KEY needed\n");
-		return 1;
+		fprintf(stderr, "access key and secret key needed\n");
+		return -1;
 	}
 
 	if (strlen(e->ak) != AK_SIZE || strlen(e->sk) != SK_SIZE) {
-		fprintf(stderr, "Wrong size OSC_ACCESS_KEY or OSC_SECRET_KEY\n");
-		return 1;
+		fprintf(stderr, "Wrong access key or secret key size\n");
+		return -1;
 	}
 
 	e->headers = NULL;
@@ -139,5 +179,12 @@ void osc_deinit_sdk(struct osc_env *e)
 	curl_slist_free_all(e->headers);
 	curl_easy_cleanup(e->c);
 	osc_deinit_str(&e->endpoint);
+	if (e->flag & OSC_ENV_FREE_AK_SK) {
+		free(e->ak);
+		e->ak = NULL;
+		free(e->sk);
+		e->sk = NULL;
+	}
 	e->c = NULL;
+	e->flag = 0;
 }
