@@ -106,12 +106,12 @@ int osc_load_region_from_conf(const char *profile, char **region)
 	strcpy(stpcpy(buf, home), dest);
 	js = json_object_from_file(buf);
 	if (!js) {
-	  fprintf(stderr, "can't open %s\n", buf);
+		fprintf(stderr, "can't open %s\n", buf);
 		return -1;
 	}
 	js = json_object_object_get(js, profile);
 	if (!js)
-		return 0;
+		return -1;
 	*region = strdup(json_object_get_string(json_object_object_get(js, "region")));
 	return 0;
 }
