@@ -119,6 +119,15 @@ EOF
 			            a.${snake_a}_str = aa;
        			    } else
 EOF
+		    elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
+		    cat <<EOF
+      				    if (!aa) {
+					fprintf(stderr, "$a argument missing\n");
+					return 1;
+				    }
+			            a.${snake_a}_str = aa;
+			    } else
+EOF
 		    else
 		    cat <<EOF
 				    if (!aa) {

@@ -69,6 +69,19 @@ EOF
 		ret += 1;
 	}
 EOF
+    elif [ 'ref' == $( echo "$t" | cut -d ' ' -f 1 ) ]; then
+	cat <<EOF
+	if (args->${snake_x}_str) {
+		if (count_args++ > 0)
+			if (osc_str_append_string(data, "," ))
+				return -1;
+		if (osc_str_append_string(data, "\"$x\\":" ))
+			return -1;
+                if (osc_str_append_string(data, args->${snake_x}_str))
+			return -1;
+		ret += 1;
+	}
+EOF
     else
 	cat <<EOF
 	if (args->$snake_x) {
