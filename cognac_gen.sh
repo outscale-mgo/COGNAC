@@ -89,10 +89,7 @@ EOF
 EOF
 		    if [ 'int' == "$type" ]; then
 			cat <<EOF
-				    if (!aa) {
-					fprintf(stderr, "$a argument missing\n");
-					return 1;
-				    }
+				    TRY(!aa, "$a argument missing\n");
 			            a.is_set_$snake_a = 1;
 			     	    a.$snake_a = atoi(aa);
        			    } else
@@ -111,29 +108,20 @@ EOF
        			    } else
 EOF
 		    elif [ 'array integer' == "$type" ]; then
-		    cat <<EOF
-				    if (!aa) {
-					fprintf(stderr, "$a argument missing\n");
-					return 1;
-				    }
+			cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
 			            a.${snake_a}_str = aa;
        			    } else
 EOF
 		    elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
-		    cat <<EOF
-      				    if (!aa) {
-					fprintf(stderr, "$a argument missing\n");
-					return 1;
-				    }
+			cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
 			            a.${snake_a}_str = aa;
 			    } else
 EOF
 		    else
-		    cat <<EOF
-				    if (!aa) {
-					fprintf(stderr, "$a argument missing\n");
-					return 1;
-				    }
+			cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
 			            a.$snake_a = aa;
        			    } else
 EOF
