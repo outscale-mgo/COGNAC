@@ -17,6 +17,20 @@
 		if (f) {fprintf(stderr, args);  return 1;}	\
 	} while(0)
 
+static int argcmp(const char *s1, const char *s2)
+{
+	while (*s1 == *s2 && *s1 && *s2) {
+		s1++;
+		s2++;
+	}
+	if ((*s2 == '.' && *s1 == '\0') ||
+	    (*s1 == '.' && *s2 == '\0'))
+		return 0;
+	return *s1 != *s2;
+}
+
+____complex_struct_func_parser____
+
 int main(int ac, char **av)
 {
 	struct osc_env e;

@@ -29,6 +29,9 @@ int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc___
 	curl_easy_setopt(e->c, CURLOPT_URL, end_call.buf);
 	curl_easy_setopt(e->c, CURLOPT_POSTFIELDS, r ? data.buf : "");
 	curl_easy_setopt(e->c, CURLOPT_WRITEDATA, out);
+	if (e->flag & OSC_VERBOSE_MODE) {
+	  printf("<Date send to curl>\n%s\n</Date send to curl>\n", data.buf);
+	}
 	res = curl_easy_perform(e->c);
 	osc_deinit_str(&end_call);
 	osc_deinit_str(&data);

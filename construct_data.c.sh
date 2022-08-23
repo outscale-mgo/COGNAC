@@ -6,11 +6,17 @@ func=$1
 
 source ./helper.sh
 
-args=$(json-search ${func}Request osc-api.json | json-search -K properties | tr -d "\n[],\"" | sed 's/  / /g')
+if [ "complex_struct" == "$2" ]; then
+    args=$(jq .components.schemas.$func <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
+    alias get_type=get_type2
+else
+    args=$(json-search ${func}Request osc-api.json | json-search -K properties | tr -d "\n[],\"" | sed 's/  / /g')
+fi
 
 for x in $args ;do
     snake_x=$(to_snakecase <<< $x)
-    t=$(get_type $x $func)
+    snake_x=$(sed s/default/default_arg/g <<< $snake_x)
+    t=$(get_type $func $x)
 
     if [ "$t" == 'bool' ]; then
 	cat <<EOF
@@ -69,7 +75,9 @@ EOF
 		ret += 1;
 	}
 EOF
-    elif [ 'ref' == $( echo "$t" | cut -d ' ' -f 1 ) ]; then
+    elif [ 'ref' == "$( echo $t | cut -d ' ' -f 1 )" ]; then
+	type="$( echo $t | cut -d ' ' -f 2 | to_snakecase)"
+
 	cat <<EOF
 	if (args->${snake_x}_str) {
 		if (count_args++ > 0)
@@ -80,6 +88,14 @@ EOF
                 if (osc_str_append_string(data, args->${snake_x}_str))
 			return -1;
 		ret += 1;
+	} else if (args->is_set_$snake_x) {
+	       if (osc_str_append_string(data, "\"$x\": { " ))
+			return -1;
+	       if (${type}_setter(&args->${snake_x}, data) < 0)
+	       	  	return -1;
+	       if (osc_str_append_string(data, "}" ))
+			return -1;
+	       ret += 1;
 	}
 EOF
     else

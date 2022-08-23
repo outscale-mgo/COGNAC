@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "curl/curl.h"
 #include "osc_sdk.h"
 #include "json.h"
@@ -34,6 +35,7 @@ const char *osc_find_description(const char *call_name)
 int osc_str_append_bool(struct osc_str *osc_str, int bool)
 {
 	int len = osc_str->len;
+	assert(osc_str);
 
 	osc_str->len = len + (bool ? 4 : 5);
 	osc_str->buf = realloc(osc_str->buf, osc_str->len + 1);
@@ -46,6 +48,7 @@ int osc_str_append_bool(struct osc_str *osc_str, int bool)
 int osc_str_append_int(struct osc_str *osc_str, int i)
 {
 	int len = osc_str->len;
+	assert(osc_str);
 
 	osc_str->buf = realloc(osc_str->buf, len + 64);
 	if (!osc_str->buf)
@@ -59,6 +62,7 @@ int osc_str_append_string(struct osc_str *osc_str, const char *str)
 {
 	if (!str)
 		return 0;
+	assert(osc_str);
 
 	int len = osc_str->len;
 	int dlen = strlen(str);
@@ -142,6 +146,8 @@ void osc_deinit_str(struct osc_str *r)
 	osc_init_str(r);
 }
 
+____complex_struct_to_string_func____
+
 ____func_code____
 
 int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
@@ -153,7 +159,7 @@ int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
 	char *env_sk = getenv("OSC_SECRET_KEY");
 
 	e->region = getenv("OSC_REGION");
-	e->flag = 0;
+	e->flag = flag;
 	endpoint = getenv("OSC_ENDPOINT_API");
 	osc_init_str(&e->endpoint);
 	if (!profile) {

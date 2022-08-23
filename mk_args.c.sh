@@ -24,6 +24,7 @@ type_to_ctype() {
 	c_type="int *"
     elif [ "ref" == $( echo "$t" | cut -d ' ' -f 1) ]; then
 	echo "        char *${snake_name}_str;"
+	echo "        int is_set_${snake_name};"
 	t=$( echo $t | cut -f 2 -d ' ' )
 	c_type="struct $(to_snakecase <<< $t) "
     fi
@@ -54,7 +55,7 @@ for l in $CALL_LIST ;do
 	snake_name=$(to_snakecase <<< "$x")
 
 	#echo "get type: $func $x"
-	t=$(get_type "$x" "$l")
+	t=$(get_type "$l" "$x")
 	#echo "// TYPE: $t"
 	type_to_ctype "$t" "${snake_name}"
     done

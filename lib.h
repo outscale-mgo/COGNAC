@@ -12,6 +12,8 @@ struct osc_str {
 
 #define OSC_ENV_FREE_AK_SK 1
 #define OSC_ENV_FREE_REGION 2
+#define OSC_VERBOSE_MODE 4
+#define OSC_INSECURE_MODE 8
 
 struct osc_env {
 	char *ak;
@@ -22,9 +24,6 @@ struct osc_env {
 	struct osc_str endpoint;
 	CURL *c;
 };
-
-#define OSC_VERBOSE_MODE 1
-#define OSC_INSECURE_MODE 2
 
 ____args____
 

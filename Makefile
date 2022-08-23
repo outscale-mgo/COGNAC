@@ -5,8 +5,9 @@ include config.mk
 
 all: cognac-completion.bash cognac
 
+#-Wincompatible-pointer-types
 cognac: main.c osc_sdk.h osc_sdk.c
-	gcc -Wall -Wextra main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac
+	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac
 
 appimagetool-x86_64.AppImage:
 	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
@@ -24,7 +25,7 @@ cognac-x86_64.AppImage: cognac cognac-completion.bash appimagetool-x86_64.AppIma
 main.c: osc-api.json call_list arguments-list.json config.sh main_tpl.c cognac_gen.sh
 	./cognac_gen.sh main_tpl.c main.c c
 
-osc_sdk.c: osc-api.json call_list arguments-list.json config.sh lib.c cognac_gen.sh
+osc_sdk.c: osc-api.json call_list arguments-list.json config.sh lib.c cognac_gen.sh construct_data.c.sh
 	./cognac_gen.sh lib.c osc_sdk.c c
 
 osc_sdk.h: osc-api.json call_list arguments-list.json config.sh lib.h cognac_gen.sh

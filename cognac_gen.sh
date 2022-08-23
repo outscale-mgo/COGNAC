@@ -13,6 +13,65 @@ shopt -s expand_aliases
 
 source ./helper.sh
 
+cli_c_type_parser()
+{
+    a=$1
+    type=$2
+    snake_a=$(to_snakecase <<< $a)
+    snake_a=$(sed s/default/default_arg/g <<< $snake_a)
+
+    if [ 'int' == "$type" ]; then
+	cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
+			            s->is_set_$snake_a = 1;
+			     	    s->$snake_a = atoi(aa);
+       			    } else
+EOF
+    elif [ 'bool' == "$type" ]; then
+	cat <<EOF
+			            s->is_set_$snake_a = 1;
+				    if (!aa || !strcasecmp(aa, "true")) {
+					s->$snake_a = 1;
+				    } else if (!strcasecmp(aa, "false")) {
+					s->$snake_a = 0;
+				    } else {
+					fprintf(stderr, "$a require true/false\n");
+					return 1;
+				    }
+       			    } else
+EOF
+    elif [ 'array integer' == "$type" ]; then
+	cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
+			            s->${snake_a}_str = aa;
+       			    } else
+EOF
+    elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
+
+	sub_type=$(echo $type | cut -d ' ' -f 2 | to_snakecase)
+	cat <<EOF
+				    char *dot_pos;
+
+				    TRY(!aa, "$a argument missing\n");
+				    dot_pos = strchr(next_a, '.');
+				    if (dot_pos++) {
+					    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa);
+					    s->is_set_${snake_a} = 1;
+				    } else {
+			                   s->${snake_a}_str = aa;
+				    }
+			    } else
+EOF
+    else
+	cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
+			            s->$snake_a = aa;
+       			    } else
+EOF
+    fi
+
+}
+
 replace_args()
 {
     while IFS= read -r line
@@ -26,6 +85,10 @@ replace_args()
 	have_func_protos=$?
 	grep ____cli_parser____ <<< "$line" > /dev/null
 	have_cli_parser=$?
+	grep ____complex_struct_func_parser____ <<< "$line" > /dev/null
+	have_complex_struct_func_parser=$?
+	grep ____complex_struct_to_string_func____ <<< "$line" > /dev/null
+	have_complex_struct_to_string_func=$?
 	grep ____call_list_dec____ <<< "$line" > /dev/null
 	have_call_list_dec=$?
 	grep ____call_list_descriptions____ <<< "$line" > /dev/null
@@ -54,7 +117,50 @@ replace_args()
 		echo -n $x
 		echo -en $D2 
 	    done
-	    echo -ne $D3 
+	    echo -ne $D3
+	elif [ $have_complex_struct_to_string_func == 0 ]; then
+	    COMPLEX_STRUCT=$(jq .components <<< $OSC_API_JSON | json-search -KR schemas | tr -d '"' | sed 's/,/\n/g' | grep -v Response | grep -v Request)
+
+	    for s in $COMPLEX_STRUCT; do
+		struct_name=$(to_snakecase <<< $s)
+		cat <<EOF
+static int ${struct_name}_setter(struct ${struct_name} *args, struct osc_str *data) {
+       int count_args = 0;
+       int ret = 0;
+EOF
+		A_LST=$(jq .components.schemas.$s <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
+
+		./construct_data.c.sh $s complex_struct
+		cat <<EOF
+	return !!ret;;			       
+}
+EOF
+	    done
+	elif [ $have_complex_struct_func_parser == 0 ]; then
+	    COMPLEX_STRUCT=$(jq .components <<< $OSC_API_JSON | json-search -KR schemas | tr -d '"' | sed 's/,/\n/g' | grep -v Response | grep -v Request)
+
+	    for s in $COMPLEX_STRUCT; do
+		#for s in "skip"; do
+		struct_name=$(to_snakecase <<< $s)
+		
+		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa) {"
+		A_LST=$(jq .components.schemas.$s <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
+		for a in $A_LST; do
+		    t=$(get_type2 "$s" "$a")
+		    snake_n=$(to_snakecase <<< $a)
+
+		    echo "	if (!strcmp(str, \"$a\")) {"
+		    cli_c_type_parser "$a" "$t"
+		done
+		cat <<EOF
+	{
+		fprintf(stderr, "'%s' not an argumemt of '$s'\n", str);	    
+	}
+EOF
+		echo "	      return 0;"
+		echo -e '}\n'
+	    done
+
 	elif [ $have_cli_parser == 0 ] ; then
 	    for l in $CALL_LIST; do
 		snake_l=$(to_snakecase <<< $l)
@@ -66,6 +172,7 @@ replace_args()
               if (!strcmp("$l", av[i])) {
 		     json_object *jobj;
 	      	     struct osc_${snake_l}_arg a = {0};
+		     struct osc_${snake_l}_arg *s = &a;
 	             int cret;
 		     ${snake_l}_arg:
 
@@ -81,51 +188,14 @@ replace_args()
 EOF
 
 		for a in $arg_list ; do
-		    type=$(get_type $a $l)
+		    type=$(get_type $l $a)
 		    snake_a=$(to_snakecase <<< $a)
+		    
 
 		    cat <<EOF
-			      if (!strcmp(next_a, "$a") ) {
+			      if (!argcmp(next_a, "$a") ) {
 EOF
-		    if [ 'int' == "$type" ]; then
-			cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            a.is_set_$snake_a = 1;
-			     	    a.$snake_a = atoi(aa);
-       			    } else
-EOF
-		    elif [ 'bool' == "$type" ]; then
-			cat <<EOF
-			            a.is_set_$snake_a = 1;
-				    if (!aa || !strcasecmp(aa, "true")) {
-					a.$snake_a = 1;
-				    } else if (!strcasecmp(aa, "false")) {
-					a.$snake_a = 0;
-				    } else {
-					fprintf(stderr, "$a require true/false\n");
-					return 1;
-				    }
-       			    } else
-EOF
-		    elif [ 'array integer' == "$type" ]; then
-			cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            a.${snake_a}_str = aa;
-       			    } else
-EOF
-		    elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
-			cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            a.${snake_a}_str = aa;
-			    } else
-EOF
-		    else
-			cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            a.$snake_a = aa;
-       			    } else
-EOF
-		    fi
+		    cli_c_type_parser "$a" "$type"
 		done
 
 		cat <<EOF
