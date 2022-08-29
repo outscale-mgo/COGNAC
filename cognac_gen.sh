@@ -207,7 +207,7 @@ EOF
 			    goto ${snake_l}_arg;
 		     }
 		     cret = osc_$snake_l(&e, &r, &a);
-            	     TRY(osc_$snake_l(&e, &r, &a), "fail to call $l: %s\n", curl_easy_strerror(cret));
+            	     TRY(cret, "fail to call $l: %s\n", curl_easy_strerror(cret));
 		     if (program_flag & OAPI_RAW_OUTPUT)
 		             puts(r.buf);
 		     else {
