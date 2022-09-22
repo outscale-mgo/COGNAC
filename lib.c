@@ -270,7 +270,7 @@ void osc_deinit_sdk(struct osc_env *e)
 	}
 	if (e->flag & OSC_ENV_FREE_REGION) {
 		free(e->region);
-		e->region = NULL; 
+		e->region = NULL;
 	}
 	e->c = NULL;
 	e->flag = 0;
