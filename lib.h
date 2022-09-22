@@ -39,6 +39,11 @@
 
 #include <curl/curl.h>
 
+#ifdef __GNUC__
+#define auto_osc_str __attribute__((cleanup(osc_deinit_str)))
+#define auto_osc_env __attribute__((cleanup(osc_deinit_sdk)))
+#endif
+
 struct osc_str {
 	int len;
 	char *buf;
