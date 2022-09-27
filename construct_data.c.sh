@@ -31,6 +31,21 @@ for x in $args ;do
 	   	ret += 1;
 	}
 EOF
+    elif [ "$t" ==  'string' ]; then
+	cat <<EOF
+	if (args->$snake_x) {
+		if (count_args++ > 0)
+			if (osc_str_append_string(data, "," ))
+				return -1;
+		if (osc_str_append_string(data, "\"$x\\":\"" ))
+			return -1;
+                if (osc_str_append_string(data, args->$snake_x))
+			return -1;
+		if (osc_str_append_string(data, "\"" ))
+			return -1;
+	   	ret += 1;
+	}
+EOF
     elif [ "$t" ==  'int' ]; then
 	cat <<EOF
 	if (args->is_set_$snake_x) {
