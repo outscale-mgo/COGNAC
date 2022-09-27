@@ -138,6 +138,7 @@ int osc_load_region_from_conf(const char *profile, char **region)
 {
 	const char *dest = "/.osc/config.json";
 	char *home = getenv("HOME");
+	struct json_object *region_obj;
 	char buf[1024];
 	struct json_object *js;
 
@@ -150,7 +151,12 @@ int osc_load_region_from_conf(const char *profile, char **region)
 	js = json_object_object_get(js, profile);
 	if (!js)
 		return -1;
-	*region = strdup(json_object_get_string(json_object_object_get(js, "region")));
+
+	region_obj = json_object_object_get(js, "region");
+	if (!region_obj) {
+		return -1;
+	}
+	*region = strdup(json_object_get_string(region_obj));
 	return 0;
 }
 
