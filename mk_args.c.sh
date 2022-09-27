@@ -28,7 +28,7 @@ type_to_ctype() {
 	t=$( echo $t | cut -f 2 -d ' ' )
 	c_type="struct $(to_snakecase <<< $t) "
     fi
-    echo "	${c_type}${snake_name}; // | $oref | $t | $snake_name "
+    echo "	${c_type}${snake_name}; /* | $oref | $t | $snake_name */"
 }
 
 for s in $COMPLEX_STRUCT; do
@@ -56,7 +56,7 @@ for l in $CALL_LIST ;do
 
 	#echo "get type: $func $x"
 	t=$(get_type "$l" "$x")
-	#echo "// TYPE: $t"
+	#echo "/* TYPE: $t */"
 	type_to_ctype "$t" "${snake_name}"
     done
     echo -e "};\n"
