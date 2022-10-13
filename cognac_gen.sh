@@ -104,9 +104,9 @@ replace_args()
 	    for x in $CALL_LIST ;do
 		echo -en $D1
 		echo $OSC_API_JSON | jq .paths.\""/$x"\".description | sed 's/<br \/>//g'
-		echo -en $D2 
+		echo -en $D2
 	    done
-	    echo -ne $D3 
+	    echo -ne $D3
 	elif [ $have_call_list_dec == 0 ]; then
 	    DELIMES=$(cut -d '(' -f 2 <<< $line | tr -d ')')
 	    D1=$(cut -d ';' -f 1  <<< $DELIMES | tr -d "'")
@@ -115,7 +115,7 @@ replace_args()
 	    for x in $CALL_LIST ;do
 		echo -en $D1
 		echo -n $x
-		echo -en $D2 
+		echo -en $D2
 	    done
 	    echo -ne $D3
 	elif [ $have_complex_struct_to_string_func == 0 ]; then
@@ -132,7 +132,7 @@ EOF
 
 		./construct_data.c.sh $s complex_struct
 		cat <<EOF
-	return !!ret;;			       
+	return !!ret;
 }
 EOF
 	    done
@@ -142,7 +142,7 @@ EOF
 	    for s in $COMPLEX_STRUCT; do
 		#for s in "skip"; do
 		struct_name=$(to_snakecase <<< $s)
-		
+
 		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa) {"
 		A_LST=$(jq .components.schemas.$s <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
 		for a in $A_LST; do
@@ -154,7 +154,7 @@ EOF
 		done
 		cat <<EOF
 	{
-		fprintf(stderr, "'%s' not an argumemt of '$s'\n", str);	    
+		fprintf(stderr, "'%s' not an argumemt of '$s'\n", str);
 	}
 EOF
 		echo "	      return 0;"
@@ -190,7 +190,6 @@ EOF
 		for a in $arg_list ; do
 		    type=$(get_type $l $a)
 		    snake_a=$(to_snakecase <<< $a)
-		    
 
 		    cat <<EOF
 			      if (!argcmp(next_a, "$a") ) {
