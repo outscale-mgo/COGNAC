@@ -59,6 +59,41 @@ EOF
 	   	ret += 1;
 	}
 EOF
+    elif [ "$t" ==  'array string' ]; then
+	cat <<EOF
+	if (args->$snake_x) {
+		char **as;
+
+		if (count_args++ > 0)
+			if (osc_str_append_string(data, "," ))
+				return -1;
+		if (osc_str_append_string(data, "\"$x\\":[" ))
+			return -1;
+		for (as = args->$snake_x; *as > 0; ++as) {
+			if (as != args->$snake_x)
+				if (osc_str_append_string(data, "," ))
+					return -1;
+			if (osc_str_append_string(data, "\"" ))
+				return -1;
+			if (osc_str_append_string(data, *as))
+				return -1;
+			if (osc_str_append_string(data, "\"" ))
+				return -1;
+		}
+		if (osc_str_append_string(data, "]" ))
+			return -1;
+		ret += 1;
+	} else if (args->${snake_x}_str) {
+		if (count_args++ > 0)
+			if (osc_str_append_string(data, "," ))
+				return -1;
+		if (osc_str_append_string(data, "\"$x\\":" ))
+			return -1;
+                if (osc_str_append_string(data, args->${snake_x}_str))
+			return -1;
+		ret += 1;
+	}
+EOF
     elif [ "$t" ==  'array integer' ]; then
 	cat <<EOF
 	if (args->$snake_x) {
@@ -73,7 +108,7 @@ EOF
 			if (ip != args->$snake_x)
 				if (osc_str_append_string(data, "," ))
 					return -1;
-			if (osc_str_append_int(data, *args->$snake_x))
+			if (osc_str_append_int(data, *ip))
 				return -1;
 		}
 		if (osc_str_append_string(data, "]" ))

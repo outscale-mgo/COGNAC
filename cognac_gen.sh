@@ -40,7 +40,7 @@ EOF
 				    }
        			    } else
 EOF
-    elif [ 'array integer' == "$type" ]; then
+    elif [ 'array integer' == "$type" -o 'array string' == "$type" ]; then
 	cat <<EOF
 				    TRY(!aa, "$a argument missing\n");
 			            s->${snake_a}_str = aa;

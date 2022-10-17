@@ -22,11 +22,16 @@ type_to_ctype() {
     elif [ "$t" == 'array integer' ]; then
 	echo "        char *${snake_name}_str;"
 	c_type="int *"
+    elif [ "$t" == 'array string' ]; then
+	echo "        char *${snake_name}_str;"
+	c_type="char **"
     elif [ "ref" == $( echo "$t" | cut -d ' ' -f 1) ]; then
 	echo "        char *${snake_name}_str;"
 	echo "        int is_set_${snake_name};"
 	t=$( echo $t | cut -f 2 -d ' ' )
 	c_type="struct $(to_snakecase <<< $t) "
+    elif [ "array" == $( echo "$t" | cut -d ' ' -f 1) ]; then
+	echo "/* type 2 $( echo "$t" | cut -d ' ' -f 2) */"
     fi
     echo "	${c_type}${snake_name}; /* | $oref | $t | $snake_name */"
 }
