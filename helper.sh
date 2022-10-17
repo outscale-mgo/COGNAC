@@ -16,6 +16,16 @@ get_type2() {
 	elif [ "$types" == 'boolean' ]; then
 	    echo bool
 	    return 0
+	elif [ "$types" == 'array' ]; then
+	    sub_type=$(jq -r .items.type 2> /dev/null <<< $arg_info)
+	    have_stype=$?
+	    if [ $have_stype == 0 ]; then
+		if [ "$sub_type" == 'string' ]; then
+		    types="array string"
+		elif [ "$sub_type" == 'integer' ]; then
+		    types="array integer"
+		fi
+	    fi
 	fi
 	echo $types
     else
