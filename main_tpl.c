@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include "json.h"
 #include "osc_sdk.h"
+#include "main-helper.h"
 
 #ifndef JSON_C_TO_STRING_COLOR
 #define JSON_C_TO_STRING_COLOR 0

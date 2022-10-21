@@ -44,6 +44,9 @@ EOF
 	cat <<EOF
 				    TRY(!aa, "$a argument missing\n");
 			            s->${snake_a}_str = aa;
+			    } else if (!strcmp(str, \"$a[]\")) {
+			      	    TRY(!aa, "$a[] argument missing\n");
+				    SET_NEXT(s->${snake_a}, aa, pa);
        			    } else
 EOF
     elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
@@ -55,7 +58,7 @@ EOF
 				    TRY(!aa, "$a argument missing\n");
 				    dot_pos = strchr(next_a, '.');
 				    if (dot_pos++) {
-					    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa);
+					    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa, pa);
 					    s->is_set_${snake_a} = 1;
 				    } else {
 			                   s->${snake_a}_str = aa;
@@ -171,6 +174,7 @@ EOF
 		cat <<EOF
               if (!strcmp("$l", av[i])) {
 		     json_object *jobj;
+		     struct ptr_array pa = {0};
 	      	     struct osc_${snake_l}_arg a = {0};
 		     struct osc_${snake_l}_arg *s = &a;
 	             int cret;
