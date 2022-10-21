@@ -41,12 +41,16 @@ EOF
        			    } else
 EOF
     elif [ 'array integer' == "$type" -o 'array string' == "$type" ]; then
+	convertor=""
+	if [ 'array integer' == "$type" ]; then
+	    convertor=atoi
+	fi
 	cat <<EOF
 				    TRY(!aa, "$a argument missing\n");
 			            s->${snake_a}_str = aa;
-			    } else if (!strcmp(str, \"$a[]\")) {
+			    } else if (!strcmp(str, "$a[]")) {
 			      	    TRY(!aa, "$a[] argument missing\n");
-				    SET_NEXT(s->${snake_a}, aa, pa);
+				    SET_NEXT(s->${snake_a}, ${convertor}(aa), pa);
        			    } else
 EOF
     elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
@@ -146,7 +150,7 @@ EOF
 		#for s in "skip"; do
 		struct_name=$(to_snakecase <<< $s)
 
-		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa) {"
+		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa, struct ptr_array *pa) {"
 		A_LST=$(jq .components.schemas.$s <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
 		for a in $A_LST; do
 		    t=$(get_type2 "$s" "$a")
@@ -174,7 +178,8 @@ EOF
 		cat <<EOF
               if (!strcmp("$l", av[i])) {
 		     json_object *jobj;
-		     struct ptr_array pa = {0};
+		     struct ptr_array opa = {0};
+		     struct ptr_array *pa = &opa;
 	      	     struct osc_${snake_l}_arg a = {0};
 		     struct osc_${snake_l}_arg *s = &a;
 	             int cret;
@@ -182,6 +187,7 @@ EOF
 
 		     if (i + 1 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
  		             char *next_a = &av[i + 1][2];
+			     char *str = next_a;
  		     	     char *aa = i + 2 < ac ? av[i + 2] : 0;
 			     int incr = aa ? 2 : 1;
 
