@@ -70,9 +70,13 @@ EOF
 			    } else
 EOF
     else
+	suffix=""
+	if [ 'ref' == $(echo $type | cut -d ' ' -f 2 ) ]; then
+	    suffix="_str"
+	fi
 	cat <<EOF
 				    TRY(!aa, "$a argument missing\n");
-			            s->$snake_a = aa;
+			            s->$snake_a${suffix} = aa; // $type $(echo $type | cut -d ' ' -f 2 )
        			    } else
 EOF
     fi
@@ -128,6 +132,11 @@ replace_args()
 	elif [ $have_complex_struct_to_string_func == 0 ]; then
 	    COMPLEX_STRUCT=$(jq .components <<< $OSC_API_JSON | json-search -KR schemas | tr -d '"' | sed 's/,/\n/g' | grep -v Response | grep -v Request)
 
+	    for s in $COMPLEX_STRUCT; do
+		struct_name=$(to_snakecase <<< $s)
+
+		echo "static int ${struct_name}_setter(struct ${struct_name} *args, struct osc_str *data);"
+	    done
 	    for s in $COMPLEX_STRUCT; do
 		struct_name=$(to_snakecase <<< $s)
 		cat <<EOF

@@ -31,9 +31,15 @@ type_to_ctype() {
 	t=$( echo $t | cut -f 2 -d ' ' )
 	c_type="struct $(to_snakecase <<< $t) "
     elif [ "array" == $( echo "$t" | cut -d ' ' -f 1) ]; then
+	if [ "ref" == $( echo "$t" | cut -d ' ' -f 2) ]; then
+	    t=$( echo $t | cut -f 3 -d ' ' )
+	    echo "        char *${snake_name}_str;"
+	    echo "        int nb_${snake_name};"
+	    c_type="struct $(to_snakecase <<< $t) *"
+	fi
 	echo "/* type 2 $( echo "$t" | cut -d ' ' -f 2) */"
     fi
-    echo "	${c_type}${snake_name}; /* | $oref | $t | $snake_name */"
+    echo "	${c_type}${snake_name}; /* | $oref |  $t | $snake_name */"
 }
 
 for s in $COMPLEX_STRUCT; do

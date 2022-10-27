@@ -149,14 +149,45 @@ EOF
 	}
 EOF
     else
+	suffix=""
+	if [ 'ref' == $(echo $t | cut -d ' ' -f 2 ) ]; then
+	    suffix="_str"
+	    type="$( echo $t | cut -d ' ' -f 3 | to_snakecase)"
+
+
+	    cat <<EOF
+        if (args->$snake_x) {
+	       	if (count_args++ > 0)
+			if (osc_str_append_string(data, "," ))
+				return -1;
+		if (osc_str_append_string(data, "\"$x\\":[" ))
+			return -1;
+		for (int i = 0; i < args->nb_${snake_x}; ++i) {
+	       	    struct ${type} *p = &args->$snake_x[i];
+		    if (p != args->$snake_x)
+		        if (osc_str_append_string(data, "," ))
+			     return -1;
+		    if (osc_str_append_string(data, "\"$x\": { " ))
+			return -1;
+	       	    if (${type}_setter(p, data) < 0)
+	       	  	return -1;
+	       	    if (osc_str_append_string(data, "}" ))
+			return -1;
+		}
+		if (osc_str_append_string(data, "]" ))
+			return -1;
+		ret += 1;
+	} else
+EOF
+	fi
 	cat <<EOF
-	if (args->$snake_x) {
+	if (args->$snake_x${suffix}) {
 		if (count_args++ > 0)
 			if (osc_str_append_string(data, "," ))
 				return -1;
 		if (osc_str_append_string(data, "\"$x\\":" ))
 			return -1;
-                if (osc_str_append_string(data, args->$snake_x))
+                if (osc_str_append_string(data, args->${snake_x}${suffix}))
 			return -1;
 		ret += 1;
 	}

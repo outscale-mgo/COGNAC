@@ -24,6 +24,10 @@ get_type2() {
 		    types="array string"
 		elif [ "$sub_type" == 'integer' ]; then
 		    types="array integer"
+		elif [ "$sub_type" == 'null' ]; then
+		    types="array ref $(json-search -R '$ref' <<< ${arg_info} | cut  -d '/' -f 4)"
+		else
+		    types="array ${sub_type}"
 		fi
 	    fi
 	fi
@@ -47,6 +51,13 @@ get_type() {
 	elif [ "$types" == 'boolean' ]; then
 	    echo bool
 	    return 0
+	elif [ "$types" == 'array' ]; then
+	    sub_ref=$(json-search -R '$ref' <<< ${arg_info} | cut  -d '/' -f 4 2> /dev/null)
+	    have_sref=$?
+
+	    if [ $have_sref == 0 ]; then
+		types="array ref $sub_ref"
+	    fi
 	fi
 	echo $types
     else

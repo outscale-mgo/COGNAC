@@ -22,13 +22,13 @@ cognac-x86_64.AppImage: cognac cognac-completion.bash appimagetool-x86_64.AppIma
 	LD_LIBRARY_PATH="$(LD_LIB_PATH)" ./cp-lib.sh cognac ./cognac.AppDir/usr/lib/
 	./appimagetool-x86_64.AppImage cognac.AppDir
 
-main.c: osc-api.json call_list arguments-list.json config.sh main_tpl.c cognac_gen.sh
+main.c: osc-api.json call_list arguments-list.json config.sh main_tpl.c cognac_gen.sh mk_args.c.sh
 	./cognac_gen.sh main_tpl.c main.c c
 
-osc_sdk.c: osc-api.json call_list arguments-list.json config.sh lib.c cognac_gen.sh construct_data.c.sh
+osc_sdk.c: osc-api.json call_list arguments-list.json config.sh lib.c cognac_gen.sh construct_data.c.sh mk_args.c.sh
 	./cognac_gen.sh lib.c osc_sdk.c c
 
-osc_sdk.h: osc-api.json call_list arguments-list.json config.sh lib.h cognac_gen.sh
+osc_sdk.h: osc-api.json call_list arguments-list.json config.sh lib.h cognac_gen.sh mk_args.c.sh
 	./cognac_gen.sh lib.h osc_sdk.h c
 
 cognac-completion.bash: osc-api.json call_list arguments-list.json config.sh cognac-completion-tpl.bash cognac_gen.sh
