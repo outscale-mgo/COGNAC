@@ -37,9 +37,8 @@ type_to_ctype() {
 	    echo "        int nb_${snake_name};"
 	    c_type="struct $(to_snakecase <<< $t) *"
 	fi
-	echo "/* type 2 $( echo "$t" | cut -d ' ' -f 2) */"
     fi
-    echo "	${c_type}${snake_name}; /* | $oref |  $t | $snake_name */"
+    echo "	${c_type}${snake_name}; /* $oref */"
 }
 
 for s in $COMPLEX_STRUCT; do
