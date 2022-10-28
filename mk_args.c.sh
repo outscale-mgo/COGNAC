@@ -57,9 +57,13 @@ done
 for l in $CALL_LIST ;do
 #for l in UpdateImage; do
     snake_l=$(to_snakecase <<< $l)
-    ARGS_LIST=$(json-search -s  ${l}Request ./osc-api.json | json-search -KR "properties" | tr -d '"' | sed 's/,/\n/g')
+    request=$(json-search -s  ${l}Request ./osc-api.json)
+    ARGS_LIST=$(echo $request | json-search -KR "properties" | tr -d '"' | sed 's/,/\n/g')
 
     echo "struct osc_${snake_l}_arg  {"
+    echo -n "        /* Required:"
+    echo $request | json-search required 2>&1 | tr -d "[]\"\n" | tr -s ' ' | sed 's/nothing found/none/g' | to_snakecase
+    echo " */"
 
     for x in $ARGS_LIST ;do
 	snake_name=$(to_snakecase <<< "$x")
