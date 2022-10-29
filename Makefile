@@ -1,9 +1,14 @@
 # COGNAC for: Code Outscale Generator New Automatic Creator
 # you can find a better name if you want.
 
-include config.mk
-
 all: cognac-completion.bash cognac
+
+config.mk:
+	@echo "config.mk is not present"
+	@echo "use './configure --help' for information, on how to make it"
+	@exit 1
+
+include config.mk
 
 #-Wincompatible-pointer-types
 cognac: main.c osc_sdk.h osc_sdk.c
