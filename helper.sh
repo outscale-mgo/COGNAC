@@ -2,11 +2,10 @@ source ./config.sh
 
 OSC_API_JSON=$(cat ./osc-api.json)
 
-get_type2() {
-    struct="$1"
+get_type3() {
+    st_info="$1"
     arg="$2"
-    arg_info=$(jq .components.schemas.$struct.properties.$arg <<< $OSC_API_JSON)
-
+    arg_info=$(json-search $arg <<< $st_info)
     types=$(jq -r .type 2> /dev/null <<< $arg_info)
     have_type=$?
     if [ $have_type == 0 ]; then
@@ -36,6 +35,18 @@ get_type2() {
 	echo ref $(json-search -R '$ref' <<< ${arg_info} | cut  -d '/' -f 4)
     fi
     return 0
+}
+
+get_type2() {
+    struct="$1"
+    arg="$2"
+    st_info=$(jq .components.schemas.$struct <<< $OSC_API_JSON)
+
+    get_type3 "$st_info" "$arg"
+}
+
+get_type_description() {
+    echo "$1" | jq .properties.$2.description
 }
 
 get_type() {

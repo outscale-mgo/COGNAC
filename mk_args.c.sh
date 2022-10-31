@@ -44,10 +44,14 @@ type_to_ctype() {
 for s in $COMPLEX_STRUCT; do
 #for s in "skip"; do
     echo  "struct $(to_snakecase <<< $s) {"
-    A_LST=$(jq .components.schemas.$s <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
+    st_info=$(jq .components.schemas.$s <<<  $OSC_API_JSON)
+    A_LST=$(json-search -K properties <<< $st_info | tr -d '",[]')
     for a in $A_LST; do
-	t=$(get_type2 "$s" "$a")
+	t=$(get_type3 "$st_info" "$a")
 	snake_n=$(to_snakecase <<< $a)
+	echo '        /*'
+	get_type_description "$st_info" "$a" | tr -d '"' | fold -s -w70 | sed -e  's/^/         * /g'
+	echo '         */'
 
 	type_to_ctype "$t" "$snake_n"
     done
@@ -68,8 +72,11 @@ for l in $CALL_LIST ;do
     for x in $ARGS_LIST ;do
 	snake_name=$(to_snakecase <<< "$x")
 
-	#echo "get type: $func $x"
 	t=$(get_type "$l" "$x")
+	#echo "get type: $func $x"
+	echo '        /*'
+	get_type_description "$request" "$x" | tr -d '"' | fold -s -w70 | sed -e  's/^/         * /g' | sed "s/null/See '$snake_name' type documentation/"
+	echo '         */'
 	#echo "/* TYPE: $t */"
 	type_to_ctype "$t" "${snake_name}"
     done
