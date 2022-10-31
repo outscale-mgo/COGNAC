@@ -167,7 +167,7 @@ EOF
 		    if (p != args->$snake_x)
 		        if (osc_str_append_string(data, "," ))
 			     return -1;
-		    if (osc_str_append_string(data, "\"$x\": { " ))
+		    if (osc_str_append_string(data, "{ " ))
 			return -1;
 	       	    if (${type}_setter(p, data) < 0)
 	       	  	return -1;
