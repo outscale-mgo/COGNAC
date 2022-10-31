@@ -103,11 +103,11 @@ replace_args()
 	grep ____call_list_dec____ <<< "$line" > /dev/null
 	have_call_list_dec=$?
 	grep ____call_list_descriptions____ <<< "$line" > /dev/null
-	have_call_list_des=$?
+	have_call_list_descr=$?
 
 	if [ $have_args == 0 ]; then
 	    ./mk_args.${lang}.sh
-	elif [ $have_call_list_des == 0 ]; then
+	elif [ $have_call_list_descr == 0 ]; then
 	    DELIMES=$(cut -d '(' -f 2 <<< $line | tr -d ')')
 	    D1=$(cut -d ';' -f 1  <<< $DELIMES | tr -d "'")
 	    D2=$(cut -d ';' -f 2  <<< $DELIMES | tr -d "'")
