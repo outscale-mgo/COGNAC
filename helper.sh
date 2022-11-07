@@ -8,7 +8,7 @@ get_type3() {
     arg_info=$(json-search $arg <<< $st_info)
     types=$(jq -r .type 2> /dev/null <<< $arg_info)
     have_type=$?
-    if [ $have_type == 0 ]; then
+    if [ $have_type == 0 -a "$types" != 'null' ]; then
 	if [ "$types" == 'integer' ]; then
 	    echo int
 	    return 0
