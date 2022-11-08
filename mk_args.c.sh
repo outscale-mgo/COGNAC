@@ -15,10 +15,14 @@ type_to_ctype() {
     local c_type="char *"
     local oref="$t"
 
-    if [ "$t" == 'int' -o "$t" == 'bool' ]; then
+    if [ "$t" == 'int' -o "$t" == 'bool' -o "$t" == 'double' ]; then
 	snake_name=$(sed s/default/default_arg/g <<< $snake_name)
 	echo "        int is_set_${snake_name};"
-	c_type="int "
+	if [ "$t" == 'double' ]; then
+	    c_type="double "
+	else
+	    c_type="int "
+	fi
     elif [ "$t" == 'array integer' ]; then
 	echo "        char *${snake_name}_str;"
 	c_type="int *"

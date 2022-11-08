@@ -27,6 +27,13 @@ cli_c_type_parser()
 			     	    s->$snake_a = atoi(aa);
        			    } else
 EOF
+    elif [ 'double' == "$type" ]; then
+	    cat <<EOF
+				    TRY(!aa, "$a argument missing\n");
+			            s->is_set_$snake_a = 1;
+			     	    s->$snake_a = atof(aa);
+       			    } else
+EOF
     elif [ 'bool' == "$type" ]; then
 	cat <<EOF
 			            s->is_set_$snake_a = 1;

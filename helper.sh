@@ -12,6 +12,9 @@ get_type3() {
 	if [ "$types" == 'integer' ]; then
 	    echo int
 	    return 0
+	elif [ "$types" == 'number' ]; then
+	    echo double
+	    return 0
 	elif [ "$types" == 'boolean' ]; then
 	    echo bool
 	    return 0
@@ -58,6 +61,9 @@ get_type() {
     if [ $have_type == 0 ]; then
 	if [ "$types" == 'integer' ]; then
 	    echo int
+	    return 0
+	elif [ "$types" == 'number' ]; then
+	    echo double
 	    return 0
 	elif [ "$types" == 'boolean' ]; then
 	    echo bool

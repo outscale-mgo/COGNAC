@@ -92,6 +92,19 @@ int osc_str_append_int(struct osc_str *osc_str, int i)
 	return 0;
 }
 
+int osc_str_append_double(struct osc_str *osc_str, double i)
+{
+	int len = osc_str->len;
+	assert(osc_str);
+
+	osc_str->buf = realloc(osc_str->buf, len + 64);
+	if (!osc_str->buf)
+		return -1;
+	osc_str->len = len + snprintf(osc_str->buf + len, 64, "%f", i);
+	osc_str->buf[osc_str->len] = 0;
+	return 0;
+}
+
 int osc_str_append_string(struct osc_str *osc_str, const char *str)
 {
 	if (!str)

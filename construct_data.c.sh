@@ -46,7 +46,7 @@ EOF
 	   	ret += 1;
 	}
 EOF
-    elif [ "$t" ==  'int' ]; then
+    elif [ "$t" ==  'int' -o  "$t" ==  'double' ]; then
 	cat <<EOF
 	if (args->is_set_$snake_x || args->$snake_x) {
 		if (count_args++ > 0)
@@ -54,7 +54,7 @@ EOF
 				return -1;
 		if (osc_str_append_string(data, "\"$x\\":" ))
 			return -1;
-                if (osc_str_append_int(data, args->$snake_x))
+                if (osc_str_append_${t}(data, args->$snake_x))
 			return -1;
 	   	ret += 1;
 	}
