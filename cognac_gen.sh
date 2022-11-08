@@ -60,7 +60,7 @@ EOF
 				    char *dot_pos;
 
 				    TRY(!aa, "$a argument missing\n");
-				    dot_pos = strchr(next_a, '.');
+				    dot_pos = strchr(str, '.');
 				    if (dot_pos++) {
 					    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa, pa);
 					    s->is_set_${snake_a} = 1;
@@ -155,6 +155,14 @@ EOF
 	elif [ $have_complex_struct_func_parser == 0 ]; then
 	    COMPLEX_STRUCT=$(jq .components <<< $OSC_API_JSON | json-search -KR schemas | tr -d '"' | sed 's/,/\n/g' | grep -v Response | grep -v Request)
 
+	    # prototypes
+	    for s in $COMPLEX_STRUCT; do
+		struct_name=$(to_snakecase <<< $s)
+		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa, struct ptr_array *pa);"
+	    done
+	    echo "" #add a \n
+
+	    # functions
 	    for s in $COMPLEX_STRUCT; do
 		#for s in "skip"; do
 		struct_name=$(to_snakecase <<< $s)
@@ -165,7 +173,7 @@ EOF
 		    t=$(get_type2 "$s" "$a")
 		    snake_n=$(to_snakecase <<< $a)
 
-		    echo "	if (!strcmp(str, \"$a\")) {"
+		    echo "	if (!argcmp(str, \"$a\")) {"
 		    cli_c_type_parser "$a" "$t"
 		done
 		cat <<EOF

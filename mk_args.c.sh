@@ -10,10 +10,10 @@ CALL_LIST=$(cat $CALL_LIST_FILE)
 COMPLEX_STRUCT=$(jq .components <<< $OSC_API_JSON | json-search -KR schemas | tr -d '"' | sed 's/,/\n/g' | grep -v Response | grep -v Request)
 
 type_to_ctype() {
-    t="$1"
-    snake_name="$2"
-    c_type="char *"
-    oref="$t"
+    local t="$1"
+    local snake_name="$2"
+    local c_type="char *"
+    local oref="$t"
 
     if [ "$t" == 'int' -o "$t" == 'bool' ]; then
 	snake_name=$(sed s/default/default_arg/g <<< $snake_name)
@@ -41,14 +41,22 @@ type_to_ctype() {
     echo "	${c_type}${snake_name}; /* $oref */"
 }
 
-for s in $COMPLEX_STRUCT; do
-#for s in "skip"; do
-    echo  "struct $(to_snakecase <<< $s) {"
-    st_info=$(jq .components.schemas.$s <<<  $OSC_API_JSON)
-    A_LST=$(json-search -K properties <<< $st_info | tr -d '",[]')
+write_struct() {
+    local s0="$1"
+    local st_info="$2"
+    local A_LST="$3"
+
+    if [ "$st_info" == "" ]; then
+	st_info=$(jq .components.schemas.$s0 <<<  $OSC_API_JSON)
+	A_LST=$(json-search -K properties <<< $st_info | tr -d '",[]')
+    fi
+
+    st_s_name=$(to_snakecase <<< $s0)
+
+    echo  "struct $st_s_name {"
     for a in $A_LST; do
-	t=$(get_type3 "$st_info" "$a")
-	snake_n=$(to_snakecase <<< $a)
+	local t=$(get_type3 "$st_info" "$a")
+	local snake_n=$(to_snakecase <<< $a)
 	echo '        /*'
 	get_type_description "$st_info" "$a" | tr -d '"' | fold -s -w70 | sed -e  's/^/         * /g'
 	echo '         */'
@@ -56,6 +64,38 @@ for s in $COMPLEX_STRUCT; do
 	type_to_ctype "$t" "$snake_n"
     done
     echo -e '};\n'
+}
+
+create_struct() {
+    #for s in "skip"; do
+    local s="$1"
+    local st0_info=$(jq .components.schemas.$s <<<  $OSC_API_JSON)
+    local A0_LST=$(json-search -K properties <<< $st0_info | tr -d '",[]')
+
+    if [ "${structs[$s]}" != "" ]; then
+	return
+    fi
+    structs["$s"]="is_set"
+    for a in $A0_LST; do
+	local t=$(get_type3 "$st0_info" "$a")
+
+	if [ "ref" == "$( echo $t | cut -d ' ' -f 1)" ]; then
+	    local sst=$( echo $t | cut -f 2 -d ' '  )
+	    local check="${structs[$sst]}"
+
+	    if [ "$check" == "" ]; then
+		write_struct "$sst" "" ""
+		structs["$sst"]="is_set"
+	    fi
+	fi
+    done
+    write_struct "$s" "$st0_info" "$A0_LST"
+}
+
+declare -A structs
+
+for s in $COMPLEX_STRUCT; do
+    create_struct "$s"
 done
 
 for l in $CALL_LIST ;do
