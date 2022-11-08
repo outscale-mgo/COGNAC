@@ -26,6 +26,9 @@ type_to_ctype() {
     elif [ "$t" == 'array integer' ]; then
 	echo "        char *${snake_name}_str;"
 	c_type="int *"
+    elif [ "$t" == 'array double' ]; then
+	echo "        char *${snake_name}_str;"
+	c_type="double *"
     elif [ "$t" == 'array string' ]; then
 	echo "        char *${snake_name}_str;"
 	c_type="char **"

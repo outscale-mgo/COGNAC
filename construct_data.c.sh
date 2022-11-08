@@ -94,10 +94,16 @@ EOF
 		ret += 1;
 	}
 EOF
-    elif [ "$t" ==  'array integer' ]; then
+    elif [ "$t" ==  'array integer' -o "$t" ==  'array double' ]; then
+	if [ "$t" ==  'array integer' ]; then
+	    sub_t='int'
+	else
+	    sub_t='double'
+	fi
+
 	cat <<EOF
 	if (args->$snake_x) {
-		int *ip;
+		$sub_t *ip;
 
 		if (count_args++ > 0)
 			if (osc_str_append_string(data, "," ))
@@ -108,7 +114,7 @@ EOF
 			if (ip != args->$snake_x)
 				if (osc_str_append_string(data, "," ))
 					return -1;
-			if (osc_str_append_int(data, *ip))
+			if (osc_str_append_${sub_t}(data, *ip))
 				return -1;
 		}
 		if (osc_str_append_string(data, "]" ))

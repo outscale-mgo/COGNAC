@@ -47,10 +47,12 @@ EOF
 				    }
        			    } else
 EOF
-    elif [ 'array integer' == "$type" -o 'array string' == "$type" ]; then
+    elif [ 'array integer' == "$type" -o 'array string' == "$type" -o 'array double' == "$type" ]; then
 	convertor=""
 	if [ 'array integer' == "$type" ]; then
 	    convertor=atoi
+	elif [ 'array double' == "$type" ]; then
+	    convertor=atof
 	fi
 	cat <<EOF
 				    TRY(!aa, "$a argument missing\n");

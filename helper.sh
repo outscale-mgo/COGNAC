@@ -26,6 +26,8 @@ get_type3() {
 		    types="array string"
 		elif [ "$sub_type" == 'integer' ]; then
 		    types="array integer"
+		elif [ "$sub_type" == 'number' ]; then
+		    types="array double"
 		elif [ "$sub_type" == 'null' ]; then
 		    types="array ref $(json-search -R '$ref' <<< ${arg_info} | cut  -d '/' -f 4)"
 		else
