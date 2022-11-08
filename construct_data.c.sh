@@ -139,6 +139,9 @@ EOF
 			return -1;
 		ret += 1;
 	} else if (args->is_set_$snake_x) {
+	       if (count_args++ > 0)
+		       if (osc_str_append_string(data, "," ))
+			       return -1;
 	       if (osc_str_append_string(data, "\"$x\": { " ))
 			return -1;
 	       if (${type}_setter(&args->${snake_x}, data) < 0)
