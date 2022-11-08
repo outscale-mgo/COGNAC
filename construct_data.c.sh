@@ -48,7 +48,7 @@ EOF
 EOF
     elif [ "$t" ==  'int' ]; then
 	cat <<EOF
-	if (args->is_set_$snake_x) {
+	if (args->is_set_$snake_x || args->$snake_x) {
 		if (count_args++ > 0)
 			if (osc_str_append_string(data, "," ))
 				return -1;
