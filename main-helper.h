@@ -1,8 +1,6 @@
 #ifndef MAIN_HELPER_H_
 #define MAIN_HELPER_H_
 
-//SET_NEXT(s->tag_values, aa, to_free_l, to_free);
-
 
 struct ptr_array {
 	void **ptrs;
@@ -10,26 +8,6 @@ struct ptr_array {
 	int size;
 };
 
-/*
-  char *dot_pos = strchr(str, '.');
-
-  if (dot_pos) {
-  int pos;
-  char *endptr;
-
-  ++dot_pos;
-  pos = strtoul(dot_pos, &endptr, 0);
-  if (endptr == dot_pos) {
-    fprintf(stderr, "'Tags' require an index (example SecurityGroup.Tags.0)\n");
-    return -1;
-  } else if (*endptr != '.') {
-    fprintf(stderr, "'Tags' require a .\n");
-    return -1;
-  }
-  TRY_ALLOC_AT(s->tags, (aa), pos, sizeof(*s->tags));
-  resource_tag_parser(&s->tags[pos], endptr + 1, aa, pa);
-  } else {
-*/
 
 #define TRY_ALLOC_AT(s, a,pa,i,size)					\
 	do {								\
