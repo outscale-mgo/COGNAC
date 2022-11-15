@@ -48,6 +48,8 @@ EOF
        			    } else
 EOF
     elif [ 'array integer' == "$type" -o 'array string' == "$type" -o 'array double' == "$type" ]; then
+
+
 	convertor=""
 	if [ 'array integer' == "$type" ]; then
 	    convertor=atoi
@@ -80,12 +82,38 @@ EOF
 EOF
     else
 	suffix=""
+	end_quote=""
+	indent_add=""
 	if [ 'ref' == $(echo $type | cut -d ' ' -f 2 ) ]; then
+	    sub_type=$(echo $type | cut -d ' ' -f 3 | to_snakecase)
 	    suffix="_str"
+	    end_quote="}"
+	    indent_add="	"
+	    cat <<EOF
+				      char *dot_pos = strchr(str, '.');
+
+				      if (dot_pos) {
+					      int pos;
+					      char *endptr;
+
+					      ++dot_pos;
+					      pos = strtoul(dot_pos, &endptr, 0);
+					      if (endptr == dot_pos) {
+						      fprintf(stderr, "'${a}' require an index (example $type.$a.0)\n");
+						      return -1;
+					      } else if (*endptr != '.') {
+						      fprintf(stderr, "'${a}' require a .\n");
+						      return -1;
+					      }
+					      TRY_ALLOC_AT(s,${snake_a}, pa, pos, sizeof(*s->${snake_a}));
+					      ${sub_type}_parser(&s->${snake_a}[pos], endptr + 1, aa, pa);
+				      } else {
+EOF
 	fi
 	cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            s->$snake_a${suffix} = aa; // $type $(echo $type | cut -d ' ' -f 2 )
+${indent_add}				    TRY(!aa, "$a argument missing\n");
+${indent_add}			            s->$snake_a${suffix} = aa; // $type $(echo $type | cut -d ' ' -f 2 )
+				    ${end_quote}
        			    } else
 EOF
     fi

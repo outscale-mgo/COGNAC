@@ -10,8 +10,46 @@ struct ptr_array {
 	int size;
 };
 
-#define SET_NEXT(a, v, pa)						\
+/*
+  char *dot_pos = strchr(str, '.');
+
+  if (dot_pos) {
+  int pos;
+  char *endptr;
+
+  ++dot_pos;
+  pos = strtoul(dot_pos, &endptr, 0);
+  if (endptr == dot_pos) {
+    fprintf(stderr, "'Tags' require an index (example SecurityGroup.Tags.0)\n");
+    return -1;
+  } else if (*endptr != '.') {
+    fprintf(stderr, "'Tags' require a .\n");
+    return -1;
+  }
+  TRY_ALLOC_AT(s->tags, (aa), pos, sizeof(*s->tags));
+  resource_tag_parser(&s->tags[pos], endptr + 1, aa, pa);
+  } else {
+*/
+
+#define TRY_ALLOC_AT(s, a,pa,i,size)					\
 	do {								\
+		int old_i = s->nb_##a;					\
+		if (s->nb_##a <= i) {					\
+			int sz = i + 1;					\
+			int oidx = ptr_array_get_idx(pa, s->a);		\
+			s->a = realloc(s->a, sz * size);		\
+			if (oidx < 0)					\
+				ptr_array_append(pa, s->a);		\
+			else {						\
+				pa->ptrs[oidx] = s->a;			\
+				s->a = pa->ptrs[oidx];			\
+			}						\
+			memset(s->a + old_i, 0, size * (sz - old_i));	\
+			s->nb_##a = sz;					\
+		}							\
+	} while (0)
+
+#define SET_NEXT(a,v,pa) do {						\
 		int cnt;						\
 		if (!a) {						\
 			ptr_array_append(pa, a);			\
@@ -19,11 +57,13 @@ struct ptr_array {
 		}							\
 		for (cnt = 0; a[cnt]; ++cnt);				\
 		if (cnt && (cnt % 63) == 0) {				\
-			a = realloc(a, (cnt + 1 + 64) * sizeof(v));	\
+			int idx = ptr_array_get_idx(pa, a);		\
+			pa->ptrs[idx] = realloc(a, (cnt + 1 + 64) * sizeof(v));	\
+			a = pa->ptrs[idx];				\
 			memset(a + cnt + 1, 0, 64 * sizeof(v));		\
 		}							\
 		a[cnt] = v;						\
-} while (0)
+	} while (0)
 
 static inline int ptr_array_append(struct ptr_array *pa, void *ptr)
 {
@@ -35,6 +75,14 @@ static inline int ptr_array_append(struct ptr_array *pa, void *ptr)
 	}
 	pa->ptrs[pa->l++] = ptr;
 	return 0;
+}
+
+static inline int ptr_array_get_idx(struct ptr_array *pa, void *ptr)
+{
+	for (int i = 0; i < pa->l; ++i)
+		if (pa->ptrs[i] == ptr)
+			return i;
+	return -1;
 }
 
 static inline int ptr_array_free_all(struct ptr_array *pa)

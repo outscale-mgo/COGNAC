@@ -11,7 +11,7 @@ config.mk:
 include config.mk
 
 #-Wincompatible-pointer-types
-cognac: main.c osc_sdk.h osc_sdk.c
+cognac: main.c osc_sdk.h osc_sdk.c main-helper.h
 	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac
 
 appimagetool-x86_64.AppImage:
