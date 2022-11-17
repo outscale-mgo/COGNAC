@@ -17,35 +17,37 @@ cli_c_type_parser()
 {
     a=$1
     type=$2
+    indent_base=$3
+    indent_plus="$indent_base    "
     snake_a=$(to_snakecase <<< $a)
     snake_a=$(sed s/default/default_arg/g <<< $snake_a)
 
     if [ 'int' == "$type" ]; then
 	cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            s->is_set_$snake_a = 1;
-			     	    s->$snake_a = atoi(aa);
-       			    } else
+${indent_plus}TRY(!aa, "$a argument missing\n");
+${indent_plus}s->is_set_$snake_a = 1;
+${indent_plus}s->$snake_a = atoi(aa);
+$indent_base } else
 EOF
     elif [ 'double' == "$type" ]; then
 	    cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            s->is_set_$snake_a = 1;
-			     	    s->$snake_a = atof(aa);
-       			    } else
+${indent_plus}TRY(!aa, "$a argument missing\n");
+${indent_plus}s->is_set_$snake_a = 1;
+${indent_plus}s->$snake_a = atof(aa);
+$indent_base } else
 EOF
     elif [ 'bool' == "$type" ]; then
 	cat <<EOF
-			            s->is_set_$snake_a = 1;
-				    if (!aa || !strcasecmp(aa, "true")) {
-					s->$snake_a = 1;
-				    } else if (!strcasecmp(aa, "false")) {
-					s->$snake_a = 0;
-				    } else {
-					fprintf(stderr, "$a require true/false\n");
-					return 1;
-				    }
-       			    } else
+${indent_plus}s->is_set_$snake_a = 1;
+${indent_plus}if (!aa || !strcasecmp(aa, "true")) {
+${indent_plus}		s->$snake_a = 1;
+$indent_plus } else if (!strcasecmp(aa, "false")) {
+${indent_plus}		s->$snake_a = 0;
+$indent_plus } else {
+${indent_plus}		fprintf(stderr, "$a require true/false\n");
+${indent_plus}		return 1;
+$indent_plus }
+$indent_base} else
 EOF
     elif [ 'array integer' == "$type" -o 'array string' == "$type" -o 'array double' == "$type" ]; then
 
@@ -57,28 +59,28 @@ EOF
 	    convertor=atof
 	fi
 	cat <<EOF
-				    TRY(!aa, "$a argument missing\n");
-			            s->${snake_a}_str = aa;
-			    } else if (!strcmp(str, "$a[]")) {
-			      	    TRY(!aa, "$a[] argument missing\n");
-				    SET_NEXT(s->${snake_a}, ${convertor}(aa), pa);
-       			    } else
+${indent_plus}	 TRY(!aa, "$a argument missing\n");
+${indent_plus}   s->${snake_a}_str = aa;
+$indent_base } else if (!strcmp(str, "$a[]")) {
+${indent_plus}   TRY(!aa, "$a[] argument missing\n");
+${indent_plus}   SET_NEXT(s->${snake_a}, ${convertor}(aa), pa);
+$indent_base } else
 EOF
     elif [ 'ref' == $( echo "$type" | cut -d ' ' -f 1 ) ]; then
 
 	sub_type=$(echo $type | cut -d ' ' -f 2 | to_snakecase)
 	cat <<EOF
-				    char *dot_pos;
+${indent_plus}char *dot_pos;
 
-				    TRY(!aa, "$a argument missing\n");
-				    dot_pos = strchr(str, '.');
-				    if (dot_pos++) {
-					    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa, pa);
-					    s->is_set_${snake_a} = 1;
-				    } else {
-			                   s->${snake_a}_str = aa;
-				    }
-			    } else
+${indent_plus}TRY(!aa, "$a argument missing\n");
+${indent_plus}dot_pos = strchr(str, '.');
+${indent_plus}if (dot_pos++) {
+${indent_plus}	    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa, pa);
+${indent_plus}	    s->is_set_${snake_a} = 1;
+$indent_plus } else {
+${indent_plus}       s->${snake_a}_str = aa;
+${indent_plus} }
+$indent_base } else
 EOF
     else
 	suffix=""
@@ -87,34 +89,34 @@ EOF
 	if [ 'ref' == $(echo $type | cut -d ' ' -f 2 ) ]; then
 	    sub_type=$(echo $type | cut -d ' ' -f 3 | to_snakecase)
 	    suffix="_str"
-	    end_quote="}"
+	    end_quote="${indent_plus}}"
 	    indent_add="	"
 	    cat <<EOF
-				      char *dot_pos = strchr(str, '.');
+${indent_plus}char *dot_pos = strchr(str, '.');
 
-				      if (dot_pos) {
-					      int pos;
-					      char *endptr;
+${indent_plus}if (dot_pos) {
+${indent_plus}	      int pos;
+${indent_plus}	      char *endptr;
 
-					      ++dot_pos;
-					      pos = strtoul(dot_pos, &endptr, 0);
-					      if (endptr == dot_pos) {
-						      fprintf(stderr, "'${a}' require an index (example $type.$a.0)\n");
-						      return -1;
-					      } else if (*endptr != '.') {
-						      fprintf(stderr, "'${a}' require a .\n");
-						      return -1;
-					      }
-					      TRY_ALLOC_AT(s,${snake_a}, pa, pos, sizeof(*s->${snake_a}));
-					      ${sub_type}_parser(&s->${snake_a}[pos], endptr + 1, aa, pa);
-				      } else {
+${indent_plus}	      ++dot_pos;
+${indent_plus}	      pos = strtoul(dot_pos, &endptr, 0);
+${indent_plus}	      if (endptr == dot_pos) {
+${indent_plus}		      fprintf(stderr, "'${a}' require an index (example $type.$a.0)\n");
+${indent_plus}		      return -1;
+${indent_plus}	      } else if (*endptr != '.') {
+${indent_plus}		      fprintf(stderr, "'${a}' require a .\n");
+${indent_plus}		      return -1;
+${indent_plus}	      }
+${indent_plus}	      TRY_ALLOC_AT(s,${snake_a}, pa, pos, sizeof(*s->${snake_a}));
+${indent_plus}	      ${sub_type}_parser(&s->${snake_a}[pos], endptr + 1, aa, pa);
+$indent_plus } else {
 EOF
 	fi
 	cat <<EOF
-${indent_add}				    TRY(!aa, "$a argument missing\n");
-${indent_add}			            s->$snake_a${suffix} = aa; // $type $(echo $type | cut -d ' ' -f 2 )
-				    ${end_quote}
-       			    } else
+${indent_plus}${indent_add}TRY(!aa, "$a argument missing\n");
+${indent_plus}${indent_add}s->$snake_a${suffix} = aa; // $type $(echo $type | cut -d ' ' -f 2 )
+${end_quote}
+$indent_base } else
 EOF
     fi
 
@@ -211,14 +213,14 @@ EOF
 		    snake_n=$(to_snakecase <<< $a)
 
 		    echo "	if (!argcmp(str, \"$a\")) {"
-		    cli_c_type_parser "$a" "$t"
+		    cli_c_type_parser "$a" "$t" "        "
 		done
 		cat <<EOF
 	{
 		fprintf(stderr, "'%s' not an argumemt of '$s'\n", str);
 	}
 EOF
-		echo "	      return 0;"
+		echo "	return 0;"
 		echo -e '}\n'
 	    done
 
@@ -258,7 +260,7 @@ EOF
 		    cat <<EOF
 			      if (!argcmp(next_a, "$a") ) {
 EOF
-		    cli_c_type_parser "$a" "$type"
+		    cli_c_type_parser "$a" "$type" "				      "
 		done
 
 		cat <<EOF
