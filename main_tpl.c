@@ -64,6 +64,9 @@ static int argcmp(const char *s1, const char *s2)
 	return *s1 != *s2;
 }
 
+static void *cascade_struct;
+static int (*cascade_parser)(void *, char *, char *, struct ptr_array *);
+
 ____complex_struct_func_parser____
 
 int main(int ac, char **av)

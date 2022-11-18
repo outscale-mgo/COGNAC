@@ -75,6 +75,11 @@ ${indent_plus}char *dot_pos;
 ${indent_plus}TRY(!aa, "$a argument missing\n");
 ${indent_plus}dot_pos = strchr(str, '.');
 ${indent_plus}if (dot_pos++) {
+${indent_plus}	    cascade_struct = &s->${snake_a};
+${indent_plus}	    cascade_parser = ${sub_type}_parser;
+${indent_plus}	    if (*dot_pos == '.') {
+${indent_plus}		++dot_pos;
+${indent_plus}	    }
 ${indent_plus}	    ${sub_type}_parser(&s->${snake_a}, dot_pos, aa, pa);
 ${indent_plus}	    s->is_set_${snake_a} = 1;
 $indent_plus } else {
@@ -108,6 +113,11 @@ ${indent_plus}		      fprintf(stderr, "'${a}' require a .\n");
 ${indent_plus}		      return -1;
 ${indent_plus}	      }
 ${indent_plus}	      TRY_ALLOC_AT(s,${snake_a}, pa, pos, sizeof(*s->${snake_a}));
+${indent_plus}	      cascade_struct = &s->${snake_a}[pos];
+${indent_plus}	      cascade_parser = ${sub_type}_parser;
+${indent_plus}	      if (endptr[1] == '.') {
+${indent_plus}		     ++endptr;
+${indent_plus}	      }
 ${indent_plus}	      ${sub_type}_parser(&s->${snake_a}[pos], endptr + 1, aa, pa);
 $indent_plus } else {
 EOF
@@ -197,7 +207,7 @@ EOF
 	    # prototypes
 	    for s in $COMPLEX_STRUCT; do
 		struct_name=$(to_snakecase <<< $s)
-		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa, struct ptr_array *pa);"
+		echo  "int ${struct_name}_parser(void *s, char *str, char *aa, struct ptr_array *pa);"
 	    done
 	    echo "" #add a \n
 
@@ -206,8 +216,9 @@ EOF
 		#for s in "skip"; do
 		struct_name=$(to_snakecase <<< $s)
 
-		echo  "int ${struct_name}_parser(struct $struct_name *s, char *str, char *aa, struct ptr_array *pa) {"
+		echo  "int ${struct_name}_parser(void *v_s, char *str, char *aa, struct ptr_array *pa) {"
 		A_LST=$(jq .components.schemas.$s <<<  $OSC_API_JSON | json-search -K properties | tr -d '",[]')
+		echo "	    struct $struct_name *s = v_s;"
 		for a in $A_LST; do
 		    t=$(get_type2 "$s" "$a")
 		    snake_n=$(to_snakecase <<< $a)
@@ -239,7 +250,28 @@ EOF
 	      	     struct osc_${snake_l}_arg a = {0};
 		     struct osc_${snake_l}_arg *s = &a;
 	             int cret;
+
+		     cascade_struct = NULL;
+		     cascade_parser = NULL;
+
 		     ${snake_l}_arg:
+
+		     if (i + 1 < ac && av[i + 1][0] == '.' && av[i + 1][1] == '.') {
+ 		           char *next_a = &av[i + 1][2];
+		           char *aa = i + 2 < ac ? av[i + 2] : 0;
+
+		      	   if (!cascade_struct) {
+		      	          fprintf(stderr, "cascade need to be se first\n");
+		      	      	  return 1;
+		      	   }
+			   if (!aa || aa[0] == '-') {
+			      	  fprintf(stderr, "cascade need an argument\n");
+		      	      	  return 1;
+			   }
+		      	   cascade_parser(cascade_struct, next_a, aa, pa);
+			   i += 2;
+		       	   goto ${snake_l}_arg;
+		      }
 
 		     if (i + 1 < ac && av[i + 1][0] == '-' && av[i + 1][1] == '-') {
  		             char *next_a = &av[i + 1][2];
