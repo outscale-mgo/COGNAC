@@ -109,8 +109,11 @@ int main(int ac, char **av)
 		} else if (!strcmp("--help", av[i])) {
 			if (av[i+1]) {
 				const char *cd = osc_find_description(av[i+1]);
+				const char *cad = osc_find_args_description(av[i+1]);
 				if (cd) {
 					puts(cd);
+					puts("Arguments Description:");
+					puts(cad);
 					return 0;
 				} else {
 					printf("Unknow Call %s\n", av[i+1]);

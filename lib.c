@@ -52,6 +52,10 @@ static const char *calls_descriptions[] = {
   ____call_list_descriptions____('\t'; ',\n'; '\tNULL\n')
 };
 
+static const char *calls_args_descriptions[] = {
+  ____call_list_args_descriptions____('\t'; ',\n'; '\tNULL\n')
+};
+
 const char *osc_find_description(const char *call_name)
 {
 	const char **c;
@@ -60,6 +64,19 @@ const char *osc_find_description(const char *call_name)
 	for (c = calls_name; c; ++c) {
 		if (!strcmp(*c, call_name))
 			return calls_descriptions[i];
+		++i;
+	}
+	return NULL;
+}
+
+const char *osc_find_args_description(const char *call_name)
+{
+	const char **c;
+	int i = 0;
+
+	for (c = calls_name; c; ++c) {
+		if (!strcmp(*c, call_name))
+			return calls_args_descriptions[i];
 		++i;
 	}
 	return NULL;

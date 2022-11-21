@@ -153,6 +153,8 @@ replace_args()
 	have_call_list_dec=$?
 	grep ____call_list_descriptions____ <<< "$line" > /dev/null
 	have_call_list_descr=$?
+	grep ____call_list_args_descriptions____ <<< "$line" > /dev/null
+	have_call_list_arg_descr=$?
 
 	if [ $have_args == 0 ]; then
 	    ./mk_args.${lang}.sh
@@ -161,10 +163,30 @@ replace_args()
 	    D1=$(cut -d ';' -f 1  <<< $DELIMES | tr -d "'")
 	    D2=$(cut -d ';' -f 2  <<< $DELIMES | tr -d "'")
 	    D3=$(cut -d ';' -f 3  <<< $DELIMES | tr -d "'")
-	    for x in $CALL_LIST ;do
+	    for x in $CALL_LIST ; do
 		echo -en $D1
-		echo $OSC_API_JSON | jq .paths.\""/$x"\".description | sed 's/<br \/>//g'
+		echo $(echo $OSC_API_JSON | jq .paths.\""/$x"\".description | sed 's/<br \/>//g')  \""\n\nRequired Argument:"   $(echo $OSC_API_JSON | json-search ${x}Request | json-search required 2>&1 | tr -d '[]\n"' | tr -s ' ' | sed 's/nothing found/none/g') "\n\""
 		echo -en $D2
+	    done
+	    echo -ne $D3
+	elif [ $have_call_list_arg_descr == 0 ]; then
+	    DELIMES=$(cut -d '(' -f 2 <<< $line | tr -d ')')
+	    D1=$(cut -d ';' -f 1  <<< $DELIMES | tr -d "'")
+	    D2=$(cut -d ';' -f 2  <<< $DELIMES | tr -d "'")
+	    D3=$(cut -d ';' -f 3  <<< $DELIMES | tr -d "'")
+	    for x in $CALL_LIST ; do
+		st_info=$(json-search -s  ${x}Request ./osc-api.json)
+		A_LST=$(json-search -K properties <<< $st_info | tr -d '",[]')
+
+		echo -en $D1
+		for a in $A_LST; do
+		    local t=$(get_type3 "$st_info" "$a")
+		    local snake_n=$(to_snakecase <<< $a)
+		    echo "\"$a:\\n\""
+		    get_type_description "$st_info" "$a" | tr -d '"' | fold -s -w70 | sed 's/<br \/>//g' | sed -e 's/^/\t"\t/;s/$/\\n"/'
+		done
+		echo -en $D2
+
 	    done
 	    echo -ne $D3
 	elif [ $have_call_list_dec == 0 ]; then

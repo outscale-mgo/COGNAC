@@ -74,6 +74,7 @@ void osc_deinit_str(struct osc_str *r);
 int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag);
 void osc_deinit_sdk(struct osc_env *e);
 const char *osc_find_description(const char *call_name);
+const char *osc_find_args_description(const char *call_name);
 
 ____functions_proto____
 
