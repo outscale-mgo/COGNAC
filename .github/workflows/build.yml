@@ -21,8 +21,8 @@ jobs:
     - name: make
       run: |
         sudo chsh -s $(which bash) $(whoami)
-        make main.c osc_sdk.c osc_sdk.h cognac-completion.bash
-        tar c osc_sdk.c osc_sdk.h main.c cognac-completion.bash > build-src.tar
+        make main.c osc_sdk.c osc_sdk.h oapi-cli-completion.bash
+        tar c osc_sdk.c osc_sdk.h main.c oapi-cli-completion.bash > build-src.tar
 
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
