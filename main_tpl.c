@@ -78,8 +78,13 @@ int main(int ac, char **av)
 	char *help_appent = getenv("COGNAC_HELP_APPEND");
 	unsigned int flag = 0;
 	unsigned int program_flag = 0;
+	char *program_name = rindex(av[0], '/');
 	int ret = 0;
 
+	if (!program_name)
+		program_name = av[0];
+	else
+		++program_name;
 	for (i = 1; i < ac; ++i) {
 		if (!strcmp("--verbose", av[i])) {
 		  flag |= OSC_VERBOSE_MODE;
@@ -99,7 +104,7 @@ int main(int ac, char **av)
 		       "\t--verbose	\tcurl backend is now verbose\n"
 		       "\t--help [CallName]\tthis, can be used with call name, example:\n\t\t\t\t%s --help ReadVms\n"
 		       "\t--color	\t\ttry to colorize json if json-c support it\n%s%s",
-		       av[0], av[0], help_appent ? help_appent : "",
+		       program_name, program_name, help_appent ? help_appent : "",
 		       help_appent ? "\n" : "");
 		return 0;
 	}
@@ -138,5 +143,5 @@ int main(int ac, char **av)
 out:
 	osc_deinit_str(&r);
 	osc_deinit_sdk(&e);
-	return 0;
+	return ret;
 }
