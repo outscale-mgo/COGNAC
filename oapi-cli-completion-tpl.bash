@@ -36,9 +36,9 @@ _cognac()
     esac
 }
 
-complete -F _cognac cognac
-complete -F _cognac cognac-x86_64.AppImage
+complete -F _cognac oapi-cli
+complete -F _cognac oapi-cli-x86_64.AppImage
 
 # thoses one are for debug
-complete -F _cognac ./cognac
-complete -F _cognac ./cognac-x86_64.AppImage
+complete -F _cognac ./oapi-cli
+complete -F _cognac ./oapi-cli-x86_64.AppImage
