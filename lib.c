@@ -44,6 +44,8 @@
 #define AK_SIZE 20
 #define SK_SIZE 40
 
+#ifdef WITH_DESCRIPTION
+
 static const char *calls_name[] = {
   ____call_list_dec____('\t"'; '",\n '; '\tNULL\n')
 };
@@ -81,6 +83,8 @@ const char *osc_find_args_description(const char *call_name)
 	}
 	return NULL;
 }
+
+#endif  /* WITH_DESCRIPTION */
 
 /* We don't use _Bool as we try to be C89 compatible */
 int osc_str_append_bool(struct osc_str *osc_str, int bool)

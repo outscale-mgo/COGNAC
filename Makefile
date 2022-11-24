@@ -12,7 +12,7 @@ include config.mk
 
 #-Wincompatible-pointer-types
 cognac: main.c osc_sdk.h osc_sdk.c main-helper.h
-	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac
+	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac -DWITH_DESCRIPTION=1
 
 appimagetool-x86_64.AppImage:
 	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
