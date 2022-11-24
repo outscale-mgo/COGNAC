@@ -165,7 +165,10 @@ replace_args()
 	    D3=$(cut -d ';' -f 3  <<< $DELIMES | tr -d "'")
 	    for x in $CALL_LIST ; do
 		echo -en $D1
-		echo $(echo $OSC_API_JSON | jq .paths.\""/$x"\".description | sed 's/<br \/>//g')  \""\n\nRequired Argument:"   $(echo $OSC_API_JSON | json-search ${x}Request | json-search required 2>&1 | tr -d '[]\n"' | tr -s ' ' | sed 's/nothing found/none/g') "\n\""
+		local usage="\"Usage: oapi-cli $x [options]\n\""
+		local call_desc=$(echo $OSC_API_JSON | jq .paths.\""/$x"\".description | sed 's/<br \/>//g' | tr -d '"' | fold -s | sed 's/^/"/;s/$/\\n"/')
+		local required=$(echo $OSC_API_JSON | json-search ${x}Request | json-search required 2>&1 | tr -d '[]\n"' | tr -s ' ' | sed 's/nothing found/none/g')
+		echo $usage $call_desc \""\nRequired Argument:" $required "\n\""
 		echo -en $D2
 	    done
 	    echo -ne $D3
@@ -182,11 +185,10 @@ replace_args()
 		for a in $A_LST; do
 		    local t=$(get_type3 "$st_info" "$a")
 		    local snake_n=$(to_snakecase <<< $a)
-		    echo "\"$a:\\n\""
-		    get_type_description "$st_info" "$a" | tr -d '"' | fold -s -w70 | sed 's/<br \/>//g' | sed -e 's/^/\t"\t/;s/$/\\n"/'
+		    echo "\"$a: $t\\n\""
+		    get_type_description "$st_info" "$a" | sed 's/<br \/>//g' | tr -d '"' | fold -s -w70 | sed 's/^/\t"\t/;s/$/\\n"/'
 		done
 		echo -en $D2
-
 	    done
 	    echo -ne $D3
 	elif [ $have_call_list_dec == 0 ]; then
