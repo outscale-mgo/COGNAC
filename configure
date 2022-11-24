@@ -38,7 +38,7 @@ EOF
         git clone https://github.com/cosmo-ray/json-c.git -b color
         mkdir json-c-build
         cd json-c-build
-        cmake3 --help > /dev/null
+        cmake3 --help 2>&1 > /dev/null
         if [ $? == 0 ]; then
             CMAKE=cmake3
         fi
@@ -46,7 +46,7 @@ EOF
         make
         cd -
 	JSON_C_CFLAGS='-I./json-c -I./json-c-build'
-	JSON_C_LDFLAGS='-L./json-c-build -ljson-c'
+	JSON_C_LDFLAGS='./json-c-build/libjson-c.a'
 	LD_JSONCLIB_PATH="./json-c-build"
 	HAVE_RECOMPILE_JSON_C=1
     elif [ "--yq-go" = $arg ]; then
