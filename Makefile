@@ -1,7 +1,7 @@
 # COGNAC for: Code Outscale Generator New Automatic Creator
 # you can find a better name if you want.
 
-all: cognac-completion.bash cognac
+all: oapi-cli-completion.bash oapi-cli
 
 config.mk:
 	@echo "config.mk is not present"
@@ -11,21 +11,21 @@ config.mk:
 include config.mk
 
 #-Wincompatible-pointer-types
-cognac: main.c osc_sdk.h osc_sdk.c main-helper.h
-	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o cognac -DWITH_DESCRIPTION=1
+oapi-cli: main.c osc_sdk.h osc_sdk.c main-helper.h
+	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o oapi-cli -DWITH_DESCRIPTION=1
 
 appimagetool-x86_64.AppImage:
 	wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage
 	chmod +x appimagetool-x86_64.AppImage
 
-cognac-x86_64.AppImage: cognac cognac-completion.bash appimagetool-x86_64.AppImage
-	mkdir -p cognac.AppDir/usr/
-	mkdir -p cognac.AppDir/usr/bin/
-	mkdir -p cognac.AppDir/usr/lib/
-	cp cognac cognac.AppDir/usr/bin/
-	cp cognac-completion.bash cognac.AppDir/usr/bin/
-	LD_LIBRARY_PATH="$(LD_LIB_PATH)" ./cp-lib.sh cognac ./cognac.AppDir/usr/lib/
-	./appimagetool-x86_64.AppImage cognac.AppDir
+oapi-cli-x86_64.AppImage: oapi-cli oapi-cli-completion.bash appimagetool-x86_64.AppImage
+	mkdir -p oapi-cli.AppDir/usr/
+	mkdir -p oapi-cli.AppDir/usr/bin/
+	mkdir -p oapi-cli.AppDir/usr/lib/
+	cp oapi-cli oapi-cli.AppDir/usr/bin/
+	cp oapi-cli-completion.bash oapi-cli.AppDir/usr/bin/
+	LD_LIBRARY_PATH="$(LD_LIB_PATH)" ./cp-lib.sh oapi-cli ./oapi-cli.AppDir/usr/lib/
+	./appimagetool-x86_64.AppImage oapi-cli.AppDir
 
 main.c: osc-api.json call_list arguments-list.json config.sh main_tpl.c cognac_gen.sh mk_args.c.sh
 	./cognac_gen.sh main_tpl.c main.c c
@@ -36,8 +36,8 @@ osc_sdk.c: osc-api.json call_list arguments-list.json config.sh lib.c cognac_gen
 osc_sdk.h: osc-api.json call_list arguments-list.json config.sh lib.h cognac_gen.sh mk_args.c.sh
 	./cognac_gen.sh lib.h osc_sdk.h c
 
-cognac-completion.bash: osc-api.json call_list arguments-list.json config.sh cognac-completion-tpl.bash cognac_gen.sh
-	./cognac_gen.sh cognac-completion-tpl.bash cognac-completion.bash bash
+oapi-cli-completion.bash: osc-api.json call_list arguments-list.json config.sh oapi-cli-completion-tpl.bash cognac_gen.sh
+	./cognac_gen.sh oapi-cli-completion-tpl.bash oapi-cli-completion.bash bash
 
 config.sh:
 	echo "alias json-search=$(JSON_SEARCH)" > config.sh
@@ -57,7 +57,7 @@ call_list: osc-api.json
 	$(JSON_SEARCH) operationId osc-api.json | tr -d "\n[]\"" | sed 's/,/ /g' > call_list
 
 clean:
-	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h main.c cognac config.sh cognac-completion.bash
+	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h main.c oapi-cli config.sh oapi-cli-completion.bash
 
 .PHONY: clean
 

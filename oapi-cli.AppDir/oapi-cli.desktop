@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
-Name=cognac
-Exec=cognac
+Name=oapi-cli
+Exec=oapi-cli
 Comment=CLI-of Outscale Granting Net Accessible Calls
 Categories=Development;Network;
 Terminal=true
