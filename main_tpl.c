@@ -78,6 +78,7 @@ int main(int ac, char **av)
 	char *help_appent = getenv("COGNAC_HELP_APPEND");
 	unsigned int flag = 0;
 	unsigned int program_flag = 0;
+	int ret = 0;
 
 	for (i = 1; i < ac; ++i) {
 		if (!strcmp("--verbose", av[i])) {
@@ -91,14 +92,14 @@ int main(int ac, char **av)
 
 	if (ac < 2) {
 	show_help:
-		printf("Usage: %s CallName [options] [--Params ParamArgument]\n"
+		printf("Usage: %s [--help] CallName [options] [--Params ParamArgument]\n"
 		       "options:\n"
 		       "\t--insecure	\tdoesn't verify SSL certificats\n"
 		       "\t--raw-print	\tdoesn't format the output\n"
 		       "\t--verbose	\tcurl backend is now verbose\n"
-		       "\t--help	\t\tthis\n"
+		       "\t--help [CallName]\tthis, can be used with call name, example:\n\t\t\t\t%s --help ReadVms\n"
 		       "\t--color	\t\ttry to colorize json if json-c support it\n%s%s",
-		       av[0], help_appent ? help_appent : "",
+		       av[0], av[0], help_appent ? help_appent : "",
 		       help_appent ? "\n" : "");
 		return 0;
 	}
@@ -129,9 +130,12 @@ int main(int ac, char **av)
 		____cli_parser____
 		{
 			printf("Unknow Call %s\n", av[i]);
+			ret = 1;
+			goto out;
 		}
 	}
 
+out:
 	osc_deinit_str(&r);
 	osc_deinit_sdk(&e);
 	return 0;
