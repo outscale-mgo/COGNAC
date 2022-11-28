@@ -9,6 +9,7 @@ CURL_CFLAGS=''
 SED_ALIAS=''
 JSON_C_CFLAGS='-I/usr/include/json-c/'
 JSON_C_LDFLAGS='-ljson-c'
+JSON_C_RULE=''
 HAVE_RECOMPILE_JSON_C=0
 LD_CURLLIB_PATH=''
 LD_JSONCLIB_PATH=''
@@ -46,6 +47,7 @@ EOF
         make
         cd -
 	JSON_C_CFLAGS='-I./json-c -I./json-c-build'
+	JSON_C_RULE='./json-c-build/libjson-c.a'
 	JSON_C_LDFLAGS='./json-c-build/libjson-c.a'
 	LD_JSONCLIB_PATH="./json-c-build"
 	HAVE_RECOMPILE_JSON_C=1
@@ -87,5 +89,6 @@ echo CURL_CFLAGS=$CURL_CFLAGS >> config.mk
 echo SED_ALIAS=$SED_ALIAS >> config.mk
 echo JSON_C_LDFLAGS=$JSON_C_LDFLAGS >> config.mk
 echo JSON_C_CFLAGS=$JSON_C_CFLAGS >> config.mk
+echo JSON_C_RULE=$JSON_C_RULE >> config.mk
 echo "config done:"
 cat config.mk
