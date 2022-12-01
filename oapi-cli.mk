@@ -1,5 +1,5 @@
 #-Wincompatible-pointer-types
-oapi-cli: main.c osc_sdk.h osc_sdk.c main-helper.h
+oapi-cli: main.c osc_sdk.h osc_sdk.c main-helper.h $(JSON_C_RULE)
 	gcc -g  main.c osc_sdk.c $(CURL_LD) $(JSON_C_LDFLAGS) $(CURL_CFLAGS) $(JSON_C_CFLAGS) -o oapi-cli -DWITH_DESCRIPTION=1
 
 appimagetool-x86_64.AppImage:
