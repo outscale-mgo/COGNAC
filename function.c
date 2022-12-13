@@ -13,7 +13,7 @@ static  int ____snake_func_____data(struct osc_____snake_func_____arg *args, str
 
 int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc_____snake_func_____arg *args)
 {
-	CURLcode res;
+	CURLcode res = CURLE_OUT_OF_MEMORY;
 	struct osc_str data;
 	struct osc_str end_call;
 	int r;
@@ -22,7 +22,7 @@ int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc___
 	osc_init_str(&end_call);
 	r = ____snake_func_____data(args, &data);
 	if (r < 0)
-		return -1;
+		goto out;
 
 	osc_str_append_string(&end_call, e->endpoint.buf);
 	osc_str_append_string(&end_call, "/api/v1/____func____");
@@ -33,6 +33,7 @@ int osc_____snake_func____(struct osc_env *e, struct osc_str *out, struct osc___
 	  printf("<Date send to curl>\n%s\n</Date send to curl>\n", data.buf);
 	}
 	res = curl_easy_perform(e->c);
+out:
 	osc_deinit_str(&end_call);
 	osc_deinit_str(&data);
 	return res;
