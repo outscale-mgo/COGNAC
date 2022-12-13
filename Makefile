@@ -8,6 +8,8 @@ config.mk:
 	@echo "use './configure --help' for information, on how to make it"
 	@exit 1
 
+OAPI_RULE_DEPEDENCIES=main.c osc_sdk.h osc_sdk.c main-helper.h
+
 include config.mk
 
 include oapi-cli.mk
