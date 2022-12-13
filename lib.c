@@ -86,6 +86,15 @@ const char *osc_find_args_description(const char *call_name)
 
 #endif  /* WITH_DESCRIPTION */
 
+static void *osc_realloc(void *buf, size_t l)
+{
+	void *ret = realloc(buf, l);
+
+	if (!ret)
+		free(buf);
+	return ret;
+}
+
 /* We don't use _Bool as we try to be C89 compatible */
 int osc_str_append_bool(struct osc_str *osc_str, int bool)
 {
@@ -93,7 +102,7 @@ int osc_str_append_bool(struct osc_str *osc_str, int bool)
 	assert(osc_str);
 
 	osc_str->len = len + (bool ? 4 : 5);
-	osc_str->buf = realloc(osc_str->buf, osc_str->len + 1);
+	osc_str->buf = osc_realloc(osc_str->buf, osc_str->len + 1);
 	if (!osc_str->buf)
 		return -1;
 	strcpy(osc_str->buf + len, (bool ? "true" : "false"));
@@ -105,7 +114,7 @@ int osc_str_append_int(struct osc_str *osc_str, int i)
 	int len = osc_str->len;
 	assert(osc_str);
 
-	osc_str->buf = realloc(osc_str->buf, len + 64);
+	osc_str->buf = osc_realloc(osc_str->buf, len + 64);
 	if (!osc_str->buf)
 		return -1;
 	osc_str->len = len + snprintf(osc_str->buf + len, 64, "%d", i);
@@ -118,7 +127,7 @@ int osc_str_append_double(struct osc_str *osc_str, double i)
 	int len = osc_str->len;
 	assert(osc_str);
 
-	osc_str->buf = realloc(osc_str->buf, len + 64);
+	osc_str->buf = osc_realloc(osc_str->buf, len + 64);
 	if (!osc_str->buf)
 		return -1;
 	osc_str->len = len + snprintf(osc_str->buf + len, 64, "%f", i);
@@ -136,7 +145,7 @@ int osc_str_append_string(struct osc_str *osc_str, const char *str)
 	int dlen = strlen(str);
 
 	osc_str->len = osc_str->len + dlen;
-	osc_str->buf = realloc(osc_str->buf, osc_str->len + 1);
+	osc_str->buf = osc_realloc(osc_str->buf, osc_str->len + 1);
 	if (!osc_str->buf)
 		return -1;
 	memcpy(osc_str->buf + len, str, dlen + 1);
@@ -202,7 +211,7 @@ static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
 	int olen = response->len;
 
 	response->len = response->len + bufsize;
-	response->buf = realloc(response->buf, response->len + 1);
+	response->buf = osc_realloc(response->buf, response->len + 1);
 	memcpy(response->buf + olen, data, bufsize);
 	response->buf[response->len] = 0;
 	return bufsize;
