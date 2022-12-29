@@ -339,6 +339,7 @@ EOF
 			     json_object_put(jobj);
 		      }
 		     osc_deinit_str(&r);
+		     ptr_array_free_all(pa);
 	      } else
 EOF
 	    done

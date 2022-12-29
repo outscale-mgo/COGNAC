@@ -71,15 +71,15 @@ ____complex_struct_func_parser____
 
 int main(int ac, char **av)
 {
-	struct osc_env e;
-	struct osc_str r;
+	auto_osc_env struct osc_env e;
+	auto_osc_str struct osc_str r;
 	int color_flag = 0;
 	int i;
 	char *help_appent = getenv("COGNAC_HELP_APPEND");
 	unsigned int flag = 0;
 	unsigned int program_flag = 0;
 	char *program_name = rindex(av[0], '/');
-	int ret = 0;
+	int ret = 1;
 
 	if (!program_name)
 		program_name = av[0];
@@ -120,10 +120,10 @@ int main(int ac, char **av)
 					puts(cd);
 					puts("Arguments Description:");
 					puts(cad);
-					return 0;
+					goto good;
 				} else {
 					printf("Unknow Call %s\n", av[i+1]);
-					return 1;
+					goto out;
 				}
 			}
 			goto show_help;
@@ -139,9 +139,8 @@ int main(int ac, char **av)
 			goto out;
 		}
 	}
-
+good:
+	ret = 0;
 out:
-	osc_deinit_str(&r);
-	osc_deinit_sdk(&e);
 	return ret;
 }
