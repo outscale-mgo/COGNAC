@@ -91,7 +91,7 @@ create_struct() {
 	    local check="${structs[$sst]}"
 
 	    if [ "$check" == "" ]; then
-		write_struct "$sst" "" ""
+		create_struct "$sst"
 		structs["$sst"]="is_set"
 	    fi
 	fi

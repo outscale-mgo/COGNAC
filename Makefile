@@ -10,6 +10,15 @@ config.mk:
 
 OAPI_RULE_DEPEDENCIES=main.c osc_sdk.h osc_sdk.c main-helper.h
 
+list_api_version:
+	curl -s https://api.github.com/repos/outscale/osc-api/tags | $(JSON_SEARCH) -R name
+
+help:
+	@echo "Available targets:"
+	@echo "- osc_sdk.c/osc_sdk.h/main.c/oapi-cli-completion.bash: make the file"
+	@echo "- list_api_version: list all version avable on github"
+	@echo "- clean: remove every generated files"
+
 include config.mk
 
 include oapi-cli.mk
@@ -31,7 +40,7 @@ config.sh:
 	echo $(SED_ALIAS) >> config.sh
 
 osc-api.json:
-	curl -s https://raw.githubusercontent.com/outscale/osc-api/master/outscale.yaml \
+	curl -s https://raw.githubusercontent.com/outscale/osc-api/$(API_VERSION)/outscale.yaml \
 		| yq $(YQ_ARG) > osc-api.json
 
 arguments-list.json: osc-api.json
@@ -43,8 +52,9 @@ arguments-list.json: osc-api.json
 call_list: osc-api.json
 	$(JSON_SEARCH) operationId osc-api.json | tr -d "\n[]\"" | sed 's/,/ /g' > call_list
 
+
 clean:
 	rm -vf osc-api.json call_list osc_sdk.c arguments-list.json osc_sdk.h main.c oapi-cli config.sh oapi-cli-completion.bash
 
-.PHONY: clean
+.PHONY: clean list_api_version help
 

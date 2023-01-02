@@ -13,6 +13,7 @@ JSON_C_RULE=''
 HAVE_RECOMPILE_JSON_C=0
 LD_CURLLIB_PATH=''
 LD_JSONCLIB_PATH=''
+API_VERSION=master
 
 for arg in $@; do
     if [ "--help" = $arg ]; then
@@ -24,7 +25,9 @@ for arg in $@; do
    --gnu-sed-alias			use gsed for sed
    --yq-go                              use go version of yq, that use diferents arguments
    --curl-path=PATH			path to curl source root
+   --target-api=VERSION			choose a version, 'master' is the default
    --curl-install-path=PATH		path to curl installed root
+   --list-api-versions			list-api-versions on github
 EOF
 	exit 0
     fi
@@ -33,6 +36,9 @@ EOF
 	wget https://github.com/cosmo-ray/json-search/releases/download/0.2/json-search-x86_64.AppImage
 	chmod +x json-search-x86_64.AppImage
 	JSON_SEARCH="./json-search-x86_64.AppImage"
+    elif [ "--list-api-versions" = $arg ]; then
+	curl -s https://api.github.com/repos/outscale/osc-api/tags | $JSON_SEARCH -R name
+	exit 0
     elif [ "--compile-json-c" = $arg ]; then
         CMAKE=cmake
 
@@ -55,6 +61,8 @@ EOF
 	YQ_ARG="-o json"
     elif [ "--gnu-sed-alias" = $arg ]; then
 	SED_ALIAS="'alias sed=gsed'"
+    elif [ "--target-api" = $( echo "$arg" | cut -d '=' -f 1) ]; then
+	API_VERSION=$( echo $arg | cut -f 2 -d '=' )
     elif [ "--curl-path" = $( echo "$arg" | cut -d '=' -f 1) ]; then
 	CURL_PATH=$( echo $arg | cut -f 2 -d '=' )
 	LD_CURLLIB_PATH="$CURL_PATH/lib/.libs/"
@@ -90,5 +98,6 @@ echo SED_ALIAS=$SED_ALIAS >> config.mk
 echo JSON_C_LDFLAGS=$JSON_C_LDFLAGS >> config.mk
 echo JSON_C_CFLAGS=$JSON_C_CFLAGS >> config.mk
 echo JSON_C_RULE=$JSON_C_RULE >> config.mk
+echo API_VERSION=$API_VERSION >> config.mk
 echo "config done:"
 cat config.mk
