@@ -54,6 +54,8 @@ struct osc_str {
 #define OSC_VERBOSE_MODE 4
 #define OSC_INSECURE_MODE 8
 
+#define OSC_API_VERSION "____api_version____"
+
 struct osc_env {
 	char *ak;
 	char *sk;
