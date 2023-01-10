@@ -330,6 +330,10 @@ EOF
 		     }
 		     cret = osc_$snake_l(&e, &r, &a);
             	     TRY(cret, "fail to call $l: %s\n", curl_easy_strerror(cret));
+		     if (!r.buf) {
+			    fprintf(stderr, "connection sucessful, but empty responce\n");
+			    return 1;
+		     }
 		     if (program_flag & OAPI_RAW_OUTPUT)
 		             puts(r.buf);
 		     else {
