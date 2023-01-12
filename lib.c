@@ -240,7 +240,13 @@ int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
 	char *endpoint;
 	char *env_ak = getenv("OSC_ACCESS_KEY");
 	char *env_sk = getenv("OSC_SECRET_KEY");
+	char *cert = getenv("OSC_CERT");
+	char *sslkey = getenv("OSC_SSLKEY");
 
+	if (!cert)
+		cert = getenv("OSC_X509_CLIENT_CERT");
+	if (!sslkey)
+		sslkey = getenv("OSC_X509_CLIENT_KEY");
 	e->region = getenv("OSC_REGION");
 	e->flag = flag;
 	endpoint = getenv("OSC_ENDPOINT_API");
@@ -292,6 +298,10 @@ int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
 		curl_easy_setopt(e->c, CURLOPT_VERBOSE, 1);
 	if (flag & OSC_INSECURE_MODE)
 		curl_easy_setopt(e->c, CURLOPT_SSL_VERIFYPEER, 0);
+	if (cert)
+		curl_easy_setopt(e->c, CURLOPT_SSLCERT, cert);
+	if (sslkey)
+		curl_easy_setopt(e->c, CURLOPT_SSLKEY, cert);
 	curl_easy_setopt(e->c, CURLOPT_HTTPHEADER, e->headers);
 	curl_easy_setopt(e->c, CURLOPT_WRITEFUNCTION, write_data);
 
