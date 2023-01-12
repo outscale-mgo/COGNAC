@@ -29,7 +29,8 @@ _cognac()
 		    COMPREPLY=($(compgen -W "____call_list____" -- ${cur}))
 		    ;;
                 *)
-                    COMPREPLY=($(compgen -W "--color --insecure --raw-print --verbose --help ____call_list____" -- ${cur}))
+                    PROFILES=$(_mk_profiles)
+                    COMPREPLY=($(compgen -W "$PROFILES --color --insecure --raw-print --verbose --help ____call_list____" -- ${cur}))
 		    ;;
             esac
             ;;
