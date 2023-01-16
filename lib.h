@@ -53,6 +53,8 @@ struct osc_str {
 #define OSC_ENV_FREE_REGION 2
 #define OSC_VERBOSE_MODE 4
 #define OSC_INSECURE_MODE 8
+#define OSC_ENV_FREE_CERT 16
+#define OSC_ENV_FREE_SSLKEY 32
 
 #define OSC_API_VERSION "____api_version____"
 
@@ -60,6 +62,8 @@ struct osc_env {
 	char *ak;
 	char *sk;
 	char *region;
+	char *cert;
+	char *sslkey;
 	int flag;
 	struct curl_slist *headers;
 	struct osc_str endpoint;
@@ -70,6 +74,14 @@ ____args____
 
 int osc_load_ak_sk_from_conf(const char *profile, char **ak, char **sk);
 int osc_load_region_from_conf(const char *profile, char **region);
+
+/**
+ * @brief parse osc config file, and store cred/key.
+ *
+ * @return if < 0, an error, otherwise a flag contain OSC_ENV_FREE_CERT,
+ *	OSC_ENV_FREE_SSLKEY, both or 0
+ */
+int osc_load_cert_from_conf(const char *profile, char **cert, char **key);
 
 void osc_init_str(struct osc_str *r);
 void osc_deinit_str(struct osc_str *r);
