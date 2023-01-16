@@ -203,6 +203,47 @@ int osc_load_region_from_conf(const char *profile, char **region)
 	return 0;
 }
 
+int osc_load_cert_from_conf(const char *profile, char **cert, char **key)
+{
+	const char *dest = "/.osc/config.json";
+	char *home = getenv("HOME");
+	struct json_object *cert_obj, *key_obj, *js;
+	char buf[1024];
+	int ret = 0;
+
+	strcpy(stpcpy(buf, home), dest);
+	js = json_object_from_file(buf);
+	if (!js) {
+		fprintf(stderr, "can't open %s\n", buf);
+		return -1;
+	}
+	js = json_object_object_get(js, profile);
+	if (!js)
+		return 0;
+
+	cert_obj = json_object_object_get(js, "cert");
+	if (!cert_obj) {
+		cert_obj = json_object_object_get(js, "x509_client_cert");
+		if (!cert_obj)
+			cert_obj = json_object_object_get(js, "client_certificate");
+	}
+	if (cert_obj) {
+		*cert = strdup(json_object_get_string(cert_obj));
+		ret |= OSC_ENV_FREE_CERT;
+	}
+
+	key_obj = json_object_object_get(js, "sslkey");
+	if (!key_obj) {
+		key_obj = json_object_object_get(js, "x509_client_sslkey");
+	}
+	if (key_obj) {
+		*key = strdup(json_object_get_string(key_obj));
+		ret |= OSC_ENV_FREE_SSLKEY;
+	}
+
+	return 0;
+}
+
 /* Function that will write the data inside a variable */
 static size_t write_data(void *data, size_t size, size_t nmemb, void *userp)
 {
@@ -260,11 +301,17 @@ int osc_init_sdk(struct osc_env *e, const char *profile, unsigned int flag)
 	}
 
 	if (profile) {
+		int f;
+
 		if (osc_load_ak_sk_from_conf(profile, &e->ak, &e->sk))
 			return -1;
+		e->flag |= OSC_ENV_FREE_AK_SK;
 		if (!osc_load_region_from_conf(profile, &e->region))
 			e->flag |= OSC_ENV_FREE_REGION;
-		e->flag |= OSC_ENV_FREE_AK_SK;
+		f = osc_load_cert_from_conf(profile, &e->cert, &e->sslkey);
+		if (f < 0)
+			return -1;
+		e->flag |= f;
 	}
 
 	if (!e->region)
@@ -331,6 +378,14 @@ void osc_deinit_sdk(struct osc_env *e)
 		free(e->region);
 		e->region = NULL;
 	}
+
+	if (e->flag & OSC_ENV_FREE_CERT) {
+		free(e->cert);
+	}
+	if (e->flag & OSC_ENV_FREE_SSLKEY) {
+		free(e->sslkey);
+	}
+
 	e->c = NULL;
 	e->flag = 0;
 }
